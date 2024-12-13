@@ -33,7 +33,8 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
@@ -43,14 +44,14 @@
         "origin": false
       },
       "eas": {
-        "projectId": "b4f447ed-188d-40d6-84b7-1ae68df31bb5"
+        "projectId": "7fb2b81e-da05-4d4d-9088-5f5808583f4a"
       }
     },
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/b4f447ed-188d-40d6-84b7-1ae68df31bb5"
+      "url": "https://u.expo.dev/7fb2b81e-da05-4d4d-9088-5f5808583f4a"
     }
   }
 }

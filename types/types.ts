@@ -5,6 +5,13 @@ export interface OnboardingItem {
   image: string | number;
 }
 
+export interface CarouselItem {
+  id: number;
+  title: string;
+  description?: string;
+  poster?: string | number;
+}
+
 export interface BankAccount {
   accountNumber: string;
   bank: {
@@ -56,4 +63,3 @@ export interface User {
   addresses: Address[];
   bankAccount: BankAccount;
 }
-

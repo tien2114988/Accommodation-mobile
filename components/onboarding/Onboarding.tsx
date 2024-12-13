@@ -11,6 +11,8 @@ interface Props {
 }
 
 const Onboarding = ({ onboardings }: Props) => {
+  
+
   const scrollX = useRef(new Animated.Value(0)).current;
   const [currentIndex, setCurrentIndex] = useState(0);
   const viewableItemsChanged = useRef(
@@ -55,11 +57,13 @@ const Onboarding = ({ onboardings }: Props) => {
             <TouchableOpacity
               className=""
               onPress={() => {
-                router.replace("/(auth)/log-in");
+                // router.replace('/(auth)/log-in');
+                router.replace('/(customer)/(home)');
+                // router.push(`/(auth)/verify?email=${email}&role=${role}`);
               }}
             >
               <Text className="text-black text-md p-5 font-normal text-xl">
-                Skip
+                Bỏ qua
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -74,7 +78,7 @@ const Onboarding = ({ onboardings }: Props) => {
             <TouchableOpacity
               className=""
               onPress={() => {
-                router.replace("/(root)/(tabs)/home");
+                router.replace('/(auth)/log-in');
               }}
             >
               <Text className="text-white text-lg font-semibold my-4 py-3 px-12 bg-green-600 rounded-full shadow-lg shadow-green-500">
