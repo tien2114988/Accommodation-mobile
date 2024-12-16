@@ -5,21 +5,12 @@ import { FreelancerWorkModel } from "@/types/workTypes";
 
 export interface User {
   id?: string;
-  jwt?: string;
-  avatar: string;
+  picture: string;
   email: string;
-  role: string;
-  dob: Date;
+  birthdate: Date;
   name: string;
   gender: string;
-  status: string;
-  balance: number;
-  phoneNumber: string;
-  reputationPoint: number;
-  googleSub: string;
-  addresses: Address[];
-  bankAccount: BankAccount;
-  freelancerWorkServices: FreelancerWorkModel[];
+  phone: string;
 }
 
 const usersApi = API.injectEndpoints({

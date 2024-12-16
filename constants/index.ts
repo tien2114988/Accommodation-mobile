@@ -17,20 +17,20 @@ i18n.defaultLocale = Language.VIETNAMESE;
 export const onboardings: OnboardingItem[] = [
   {
     id: 1,
-    title: i18n.t("onboard_1_title"),
-    description: i18n.t("onboard_1_decription"),
+    title: "Tìm trọ",
+    description: "Ứng dụng tìm nhà dễ dàng, nhanh chóng và phù hợp với nhu cầu của bạn!",
     image: images.onboarding1,
   },
   {
     id: 2,
-    title: i18n.t("onboard_2_title"),
-    description: i18n.t("onboard_2_decription"),
+    title: "Tìm bạn ở ghép",
+    description: "Tìm bạn ở ghép lý tưởng, chia sẽ không gian sống với chi phí hợp lý",
     image: images.onboarding2,
   },
   {
     id: 3,
-    title: i18n.t("onboard_3_title"),
-    description: i18n.t("onboard_3_decription"),
+    title: "Uy tín - chất lượng",
+    description: "Cam kết cung cấp những thông tin nhà ở uy tín và đáng tin cậy cho bạn",
     image: images.onboarding3,
   },
 ];

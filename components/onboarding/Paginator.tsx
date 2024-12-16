@@ -25,7 +25,7 @@ const Paginator = ({ data, scrollX }: Props) => {
 
         const dotWidth = scrollX.interpolate({
           inputRange,
-          outputRange: [10, 20, 10],
+          outputRange: [10, 25, 10],
           extrapolate: "clamp",
         });
 
@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
   dot: {
     height: 10,
     borderRadius: 5,
-    backgroundColor: "green",
-    marginHorizontal: 8,
+    backgroundColor: "#5517FF",
+    marginHorizontal: 5,
   },
 });
 

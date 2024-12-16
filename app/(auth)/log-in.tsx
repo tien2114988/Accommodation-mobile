@@ -13,13 +13,16 @@ import {
   AlertCircleIcon,
   CircleIcon,
   EyeIcon,
+  EyeOffIcon,
+  LockIcon,
   MailIcon,
 } from "@/components/ui/icon";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { useLoginMutation, useSendOtpMutation } from "@/services";
+import { useLoginMutation } from "@/services";
 import { Link, router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   Keyboard,
   Pressable,
@@ -28,81 +31,74 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getLocales } from "expo-localization";
-import { i18n, Language } from "@/localization";
 import { Box } from "@/components/ui/box";
-import { Divider } from "@/components/ui/divider";
-import { HStack } from "@/components/ui/hstack";
-import GoogleSvg from "@/components/svg/GoogleSvg";
-import FacebookSvg from "@/components/svg/FacebookSvg";
-import {
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
-} from "@/components/ui/radio";
 import { useDebounce, validateEmail } from "@/utils/helper";
 import { Text } from "@/components/ui/text";
-
-// i18n.locale = getLocales()[0].languageCode ?? "vn";
-i18n.locale = "vn";
-i18n.enableFallback = true;
-i18n.defaultLocale = Language.VIETNAMESE;
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 const LogIn = () => {
   // Set Valid
-  const [isInvalid, setIsInvalid] = useState(false);
-  const [errorText, setErrorText] = useState("");
+  const [isInvalidEmail, setIsInvalidEmail] = useState(false);
+  const [isInvalidPassword, setIsInvalidPassword] = useState(false);
+  const [errorEmail, setErrorEmail] = useState<string>("");
+  const [errorPassword, setErrorPassword] = useState<string>("");
   const [loading, setLoading] = useState(false);
-
-  const [isRoleInvalid, setIsRoleInvalid] = useState(false);
-  const [errorRoleText, setErrorRoleText] = useState("");
 
   // Set form
   const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const debounceEmail = useDebounce(email, 1000);
-  const [role, setRole] = useState<string>("");
+
+  // Handle Logic
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  const handleState = () => {
+    setShowPassword((showState) => {
+      return !showState;
+    });
+  };
+
   // Call Api
-  const [sendOtp] = useSendOtpMutation();
+  const [login] = useLoginMutation();
 
   const handleSubmit = async () => {
-    setLoading(true);
-    setErrorText("");
-    setIsInvalid(false);
-    setIsRoleInvalid(false);
+    try {
+      setLoading(true);
+      setErrorEmail("");
+      setErrorPassword("");
+      setIsInvalidEmail(false);
+      setIsInvalidPassword(false);
 
-    // Check Email
-    if (!validateEmail(email)) {
-      setIsInvalid(true);
-      setErrorText(i18n.t("mail_invalid"));
-      setLoading(false);
+      // Check Email
+      if (!validateEmail(email)) {
+        setIsInvalidEmail(true);
+        setErrorEmail("Vui lòng nhập địa chỉ email hợp lệ");
+      }
+
+      // Check password
+      if (password.length < 8) {
+        setIsInvalidPassword(true);
+        setErrorPassword("Nhập mật khẩu lớn hơn 8 kí tự");
+        return;
+      }
+      console.log(email, password);
       return;
-    }
+      const response = await login({ email, password });
+      console.log(response);
 
-    // Check Role
-    if (!role) {
-      setIsRoleInvalid(true);
-      setErrorRoleText(i18n.t("role_not_found"));
+      if (response.error) {
+        const message = response.error.data?.message || "Unknown error";
+        alert(message);
+      } else {
+        setIsInvalidEmail(false);
+        setIsInvalidPassword(false);
+        // router.push(`/(auth)/verify?email=${email}&role=${role}`);
+        router.push(`/(customer)/(home)`);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
       setLoading(false);
-      return;
-    }
-
-    // console.log(email, role);
-
-    const response = await sendOtp({ email, role });
-    console.log(response);
-
-    if (response.error) {
-      const message = response.error.data?.message || "Unknown error";
-      // console.log(message);
-      setIsInvalid(true);
-      setErrorText(message);
-      setLoading(false);
-    } else {
-      setLoading(false);
-      setIsInvalid(false);
-      router.push(`/(auth)/verify?email=${email}&role=${role}`);
     }
   };
 
@@ -113,14 +109,14 @@ const LogIn = () => {
       email.length > 0
     ) {
       if (!validateEmail(email)) {
-        setIsInvalid(true);
-        setErrorText(i18n.t("mail_invalid"));
+        setIsInvalidEmail(true);
+        setErrorEmail("Vui lòng nhập địa chỉ email hợp lệ");
       } else {
-        setIsInvalid(false);
+        setIsInvalidEmail(false);
       }
     } else {
-      setIsInvalid(false);
-      setErrorText("");
+      setIsInvalidEmail(false);
+      setErrorEmail("");
     }
   }, [debounceEmail]);
 
@@ -129,57 +125,40 @@ const LogIn = () => {
       className="flex h-full items-center justify-between"
       onPress={Keyboard.dismiss}
     >
-      <Box className="flex items-center justify-start h-full bg-white gap-5">
-        <Image
-          className="h-full w-full absolute opacity-50"
-          source={require("@/assets/images/bg.png")}
-        />
-
+      <Box className="flex items-center justify-start h-full bg-white gap-4 px-5">
         {/* header */}
-        <Box className="p-5 mt-10 flex flex-row items-center justify-between ">
-          <Box className="flex-1 flex-row gap-1">
-            <Text size="3xl" className="text-black font-extrabold">
-              Home
-            </Text>
-            <Text size="3xl" className="text-success-600 font-extrabold">
-              Service
-            </Text>
-          </Box>
-          <View className="flex-2 bg-white border-2 border-primary-300 rounded-md">
-            <Button
-              size="md"
-              variant="solid"
-              action="primary"
-              className="bg-white"
-            >
-              <ButtonText className="text-primary-500">
-                {i18n.t("language")}
-              </ButtonText>
-            </Button>
-          </View>
+        <Box className="p-5 mt-10 flex-start gap-2 flex-row items-center w-full">
+          <MaterialIcons name="cabin" size={28} color="black" />
+          <Text size="2xl" className="text-black w-full font-extrabold">
+            Accomodation seeking
+          </Text>
         </Box>
+        {/* Title */}
+        <Box className="p-5 flex flex-col flex-start w-full">
+          <Text size="5xl" className="text-black w-full font-extrabold">
+            Đăng nhập
+          </Text>
 
-        {/* Logo */}
-        <Box className="shadow-2xl">
-          <Image
-            className="w-40 h-40 rounded-full"
-            source={require("@/assets/images/logo.jpg")}
-          />
+          <Text size="lg" className="text-gray-600 w-full font-normal">
+            Nhập email và mật khẩu để đăng nhập
+          </Text>
         </Box>
 
         {/* login */}
-        <Box className="p-10 w-[90%] rounded-xl flex gap-5 bg-white border border-gray-200">
+        <Box className="p-5 w-full rounded-xl flex gap-5 bg-white">
           {/* Input */}
           {/* Email */}
           <FormControl
-            isInvalid={isInvalid}
+            isInvalid={isInvalidEmail}
             size="md"
             isDisabled={false}
             isReadOnly={false}
             isRequired={false}
           >
             <FormControlLabel>
-              <FormControlLabelText size="lg">Email</FormControlLabelText>
+              <FormControlLabelText size="lg" className="text-gray-600">
+                Email
+              </FormControlLabelText>
             </FormControlLabel>
             <TouchableWithoutFeedback>
               <Input size="lg" className="my-1 flex items-center h-12">
@@ -189,7 +168,7 @@ const LogIn = () => {
                 <InputField
                   className="leading-none px-4 py-2 h-full"
                   type="text"
-                  placeholder={`${i18n.t("mail_placeholder")}`}
+                  placeholder={`Vui lòng Nhập email`}
                   value={email}
                   onChangeText={(text) => setEmail(text)}
                 />
@@ -198,117 +177,93 @@ const LogIn = () => {
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>{errorText}</FormControlErrorText>
+              <FormControlErrorText>{errorEmail}</FormControlErrorText>
             </FormControlError>
           </FormControl>
 
-          {/* Role */}
-
+          {/* Password */}
           <FormControl
-            isInvalid={isRoleInvalid}
+            isInvalid={isInvalidPassword}
             size="md"
             isDisabled={false}
             isReadOnly={false}
             isRequired={false}
           >
             <FormControlLabel>
-              <FormControlLabelText size="lg">Role</FormControlLabelText>
+              <FormControlLabelText size="lg" className="text-gray-600">
+                Mật khẩu
+              </FormControlLabelText>
             </FormControlLabel>
-            <RadioGroup
-              className="flex  flex-row justify-between"
-              value={role}
-              onChange={setRole}
-            >
-              <Radio
-                value="FREELANCER"
-                size="lg"
-                isInvalid={false}
-                isDisabled={false}
-              >
-                <RadioIndicator>
-                  <RadioIcon as={CircleIcon} />
-                </RadioIndicator>
-                <RadioLabel>{i18n.t("freelancer")}</RadioLabel>
-              </Radio>
-              <Radio
-                value="CUSTOMER"
-                size="lg"
-                isInvalid={false}
-                isDisabled={false}
-              >
-                <RadioIndicator>
-                  <RadioIcon as={CircleIcon} />
-                </RadioIndicator>
-                <RadioLabel>{i18n.t("customer")}</RadioLabel>
-              </Radio>
-            </RadioGroup>
+            <TouchableWithoutFeedback>
+              <Input size="lg" className="my-1 flex items-center h-12">
+                <InputSlot className="pl-3 flex items-center">
+                  <InputIcon as={LockIcon} size={"lg"} />
+                </InputSlot>
+                <InputField
+                  className="leading-none px-4 py-2 h-full"
+                  type={showPassword ? "text" : "password"}
+                  placeholder={`Vui lòng nhập mật khẩu`}
+                  value={password}
+                  onChangeText={(text) => setPassword(text)}
+                />
+                <InputSlot
+                  className="pr-3 flex items-center"
+                  onPress={handleState}
+                >
+                  <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
+                </InputSlot>
+              </Input>
+            </TouchableWithoutFeedback>
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>{errorRoleText}</FormControlErrorText>
+              <FormControlErrorText>{errorPassword}</FormControlErrorText>
             </FormControlError>
           </FormControl>
 
           {/* Button */}
           <Box className="flex flex-col justify-between">
-            {/* Login */}
-            <TouchableWithoutFeedback>
-              <Button
-                className="w-full self-end mt-2 bg-green-500 border-none"
-                size="md"
-                onPress={handleSubmit}
-                variant="solid"
-                action="positive"
-              >
-                {loading && <ButtonSpinner color={"#D1D5DB"} />}
-                <ButtonText size="lg" className="text-white">
-                  {i18n.t("login")}
-                </ButtonText>
-              </Button>
-            </TouchableWithoutFeedback>
-
-            {/* You have account */}
-            <Box className="flex flex-row gap-2 items-center mt-4">
-              <Text size="md" className="text-center">
-                {i18n.t("not_have_account")}
-              </Text>
+            {/* Forget Password */}
+            <Box className="flex flex-row items-center w-full justify-end">
               <Pressable
                 onPress={() => {
                   router.replace("/(auth)/sign-up");
                 }}
               >
-                <Text size="lg" className="font-bold color-green-600">
-                  {i18n.t("signup")}
+                <Text size="md" className="font-bold text-[#4D81E7]">
+                  Quên mật khẩu
                 </Text>
               </Pressable>
             </Box>
 
-            <Box className="mt-3 px-10 w-full flex flex-row items-center justify-center">
-              <Divider className="my-1 w-1/2" />
-              <Text className="text-center px-4">{i18n.t("or")}</Text>
-              <Divider className="my-1 w-1/2" />
-            </Box>
-            {/* Login third party */}
-            <HStack
-              space="md"
-              reversed={false}
-              className="flex justify-center items-center mt-4"
+            {/* Login */}
+            <Pressable
+              onPress={handleSubmit}
+              className={`w-full h-12 bg-[#0973A8] rounded-lg flex justify-center items-center mt-2 ${
+                loading ? "opacity-70" : "opacity-100"
+              }`}
             >
-              {/* Google */}
-              <TouchableOpacity className="w-full hover:bg-red-500">
-                <Button
-                  variant="outline"
-                  action="secondary"
-                  className="bg-white flex flex-row items-center border border-gray-200 py-5"
-                  isPressed={false}
-                >
-                  <GoogleSvg />
-                  <ButtonText className="h-6 text-black text-lg flex items-center">
-                    Google
-                  </ButtonText>
-                </Button>
-              </TouchableOpacity>
-            </HStack>
+              {loading && <ActivityIndicator color="#D1D5DB" />}
+              {!loading && (
+                <Text className="text-white font-bold text-lg">Đăng nhập</Text>
+              )}
+            </Pressable>
+
+            {/* You have account */}
+            <Box className="flex flex-row items-center gap-2 mt-4 w-full justify-center">
+              <Text size="md" className="text-center">
+                Không có tài khoản ?
+              </Text>
+              <Pressable
+                onPress={() => {
+                  router.push("/(auth)/sign-up");
+                }}
+              >
+                <Text size="lg" className="font-bold text-[#4D81E7]">
+                  Đăng ký
+                </Text>
+              </Pressable>
+            </Box>
           </Box>
         </Box>
       </Box>

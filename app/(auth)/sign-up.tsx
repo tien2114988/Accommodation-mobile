@@ -1,10 +1,4 @@
-import {
-  Image,
-  Keyboard,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
   FormControl,
   FormControlError,
@@ -15,222 +9,382 @@ import {
   FormControlLabel,
   FormControlLabelText,
 } from "@/components/ui/form-control";
-import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
-import { i18n, Language } from "@/localization";
-import { Box } from "@/components/ui/box";
-import { useEffect, useState } from "react";
+import {
+  AlertCircleIcon,
+  AtSignIcon,
+  CalendarDaysIcon,
+  CircleIcon,
+  EyeIcon,
+  EyeOffIcon,
+  LockIcon,
+  MailIcon,
+  PhoneIcon,
+} from "@/components/ui/icon";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { AlertCircleIcon, CircleIcon, MailIcon } from "@/components/ui/icon";
+import { useSignupMutation } from "@/services";
 import { Link, router } from "expo-router";
-import { Divider } from "@/components/ui/divider";
-import { HStack } from "@/components/ui/hstack";
-import FacebookSvg from "@/components/svg/FacebookSvg";
-import GoogleSvg from "@/components/svg/GoogleSvg";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  Keyboard,
+  Modal,
+  Pressable,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Box } from "@/components/ui/box";
 import { useDebounce, validateEmail } from "@/utils/helper";
-import { useSendOtpMutation } from "@/services";
 import { Text } from "@/components/ui/text";
-import { Pressable } from "@/components/ui/pressable";
-// i18n.locale = getLocales()[0].languageCode ?? "vn";
-i18n.locale = "vn";
-i18n.enableFallback = true;
-i18n.defaultLocale = Language.VIETNAMESE;
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import * as Yup from "yup";
+import { Form, Formik, useFormik } from "formik";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { Calendar } from "react-native-calendars";
+import { Button as ButtonRN } from "react-native";
+
+const SignUpSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(2, "Tên phải có ít nhất 2 ký tự")
+    .required("Vui lòng nhập tên"),
+  phone: Yup.string()
+    .matches(/^[0-9]+$/, "Số điện thoại không hợp lệ")
+    .min(10, "Số điện thoại phải có ít nhất 10 chữ số")
+    .required("Vui lòng nhập số điện thoại"),
+  email: Yup.string()
+    .email("Email không hợp lệ")
+    .required("Vui lòng nhập email"),
+  birthdate: Yup.date()
+    .max(new Date(), "Ngày sinh không hợp lệ")
+    .required("Vui lòng chọn ngày sinh"),
+  password: Yup.string()
+    .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
+    .required("Vui lòng nhập mật khẩu"),
+});
+
+const initialValues = {
+  name: "",
+  phone: "",
+  email: "",
+  birthdate: "",
+  password: "",
+};
 
 const SignUp = () => {
-  // Set Valid
-  const [isInvalid, setIsInvalid] = useState(false);
-  const [errorText, setErrorText] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
+  // Date
 
-  // Set form
-  const [email, setEmail] = useState<string>("");
-  const debounceEmail = useDebounce(email, 1000);
-  // Call Api
-  const [sendOtp] = useSendOtpMutation();
+  const [showPicker, setShowPicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState({
+    day: 1,
+    month: 1,
+    year: 2024,
+  });
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    setErrorText("");
-    setIsInvalid(false);
+  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const years = Array.from({ length: 50 }, (_, i) => 2024 - i);
+  
+  // Form
+  const formik = useFormik({
+    initialValues: initialValues,
+    validationSchema: SignUpSchema,
+    onSubmit: async (values, { setSubmitting }) => {
+      console.log("Form submitted with values:", values);
 
-    // Check Email
-    if (!validateEmail(email)) {
-      setIsInvalid(true);
-      setErrorText(i18n.t("mail_invalid"));
-      setLoading(false);
-      return;
-    }
+      try {
+        return;
+        // const response = await signup({ email, password });
+        // console.log(response);
 
-    const response = await sendOtp({ email });
-    console.log(response);
-
-    if (response.error) {
-      const message = response.error.data?.message || "Unknown error";
-      // console.log(message);
-      setIsInvalid(true);
-      setErrorText(message);
-      setLoading(false);
-    } else {
-      setLoading(false);
-      setIsInvalid(false);
-      router.push(`/(auth)/verify_signup?email=${email}`);
-    }
-  };
-  useEffect(() => {
-    if (
-      debounceEmail !== undefined &&
-      email !== undefined &&
-      email.length > 0
-    ) {
-      if (!validateEmail(email)) {
-        setIsInvalid(true);
-        setErrorText(i18n.t("mail_invalid"));
-      } else {
-        setIsInvalid(false);
+        // if (response.error) {
+        //   const message = response.error.data?.message || "Unknown error";
+        //   alert(message);
+        // } else {
+        //   setIsInvalidEmail(false);
+        //   setIsInvalidPassword(false);
+        //   // router.push(`/(auth)/verify?email=${email}&role=${role}`);
+        //   router.push(`/(customer)/(home)`);
+        // }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        // setLoading(false);
       }
-    } else {
-      setIsInvalid(false);
-      setErrorText("");
-    }
-  }, [debounceEmail]);
+    },
+  });
+
+  // Call Api
+  const [signup, { isLoading }] = useSignupMutation();
+
+  // Handle
+
+  const handleState = () => {
+    setShowPassword((showState) => {
+      return !showState;
+    });
+  };
 
   return (
     <TouchableWithoutFeedback
-      className="flex h-full items-center"
+      className="flex h-full items-center justify-between"
       onPress={Keyboard.dismiss}
     >
-      <View className="flex items-center justify-start h-full bg-white gap-5">
-        <Image
-          className="h-full w-full absolute opacity-50"
-          source={require("@/assets/images/bg1.png")}
-        />
-        <Box className="p-5 mt-10 flex flex-row items-center justify-between ">
-          <Box className="flex-1 flex-row gap-1">
-            <Text size="3xl" className="text-black font-extrabold">
-              Home
-            </Text>
-            <Text size="3xl" className="text-success-600 font-extrabold">
-              Service
-            </Text>
-          </Box>
-          <Box className="flex-2 bg-white border-2 border-primary-300 rounded-md">
-            <Button
-              size="md"
-              variant="solid"
-              action="primary"
-              className="bg-white"
-            >
-              <ButtonText className="text-primary-500">
-                {i18n.t("language")}
-              </ButtonText>
-            </Button>
-          </Box>
+      <Box className="flex items-center justify-start h-full bg-white gap-2 px-5">
+        {/* header */}
+        <Box className="p-5 mt-10 flex-start flex-row items-center w-full">
+          <TouchableOpacity
+            onPress={() => router.back()}
+            // className="bg-white flex rounded-full w-16 h-16 items-center justify-center"
+          >
+            <AntDesign name="arrowleft" size={36} color="black" />
+          </TouchableOpacity>
+        </Box>
+        {/* Title */}
+        <Box className="p-5 flex flex-col flex-start w-full">
+          <Text size="5xl" className="text-black w-full font-extrabold">
+            Đăng ký
+          </Text>
+
+          <Text size="lg" className="text-gray-600 w-full font-normal">
+            Tạo tài khoản để đăng nhập
+          </Text>
         </Box>
 
-        {/* Logo */}
-        <Box className="shadow-2xl">
-          <Image
-            className="w-40 h-40 rounded-full"
-            source={require("@/assets/images/logo.jpg")}
-          />
-        </Box>
-        {/* signup */}
-        <Box className="p-10 w-[90%] rounded-xl flex gap-5 bg-white border border-gray-200">
+        {/* Signup form */}
+        <Box className="p-5 w-full rounded-xl flex gap-2 bg-white">
           {/* Input */}
-          {/* Email */}
+
+          {/* Name */}
           <FormControl
-            isInvalid={isInvalid}
+            isInvalid={formik.errors.name ? true : false}
             size="md"
             isDisabled={false}
             isReadOnly={false}
             isRequired={false}
           >
             <FormControlLabel>
-              <FormControlLabelText size="lg">Email</FormControlLabelText>
+              <FormControlLabelText size="lg" className="text-gray-600">
+                Họ và tên
+              </FormControlLabelText>
             </FormControlLabel>
             <TouchableWithoutFeedback>
-              <Input size="lg" className="my-1 flex items-center h-12">
+              <Input size="lg" className="flex items-center h-12">
+                <InputSlot className="pl-3 flex items-center">
+                  <InputIcon as={AtSignIcon} size={"lg"} />
+                </InputSlot>
+                <InputField
+                  className="leading-none px-4 py-2 h-full"
+                  type="text"
+                  placeholder={`Vui lòng nhập họ và tên`}
+                  value={formik.values.name}
+                  onChangeText={formik.handleChange("name")}
+                />
+              </Input>
+            </TouchableWithoutFeedback>
+
+            <FormControlError>
+              <FormControlErrorIcon as={AlertCircleIcon} />
+              <FormControlErrorText>{formik.errors.name}</FormControlErrorText>
+            </FormControlError>
+          </FormControl>
+
+          {/* Email */}
+          <FormControl
+            isInvalid={formik.errors.email ? true : false}
+            size="md"
+            isDisabled={false}
+            isReadOnly={false}
+            isRequired={false}
+          >
+            <FormControlLabel>
+              <FormControlLabelText size="lg" className="text-gray-600">
+                Email
+              </FormControlLabelText>
+            </FormControlLabel>
+            <TouchableWithoutFeedback>
+              <Input size="lg" className="flex items-center h-12">
                 <InputSlot className="pl-3 flex items-center">
                   <InputIcon as={MailIcon} size={"lg"} />
                 </InputSlot>
                 <InputField
-                  size="lg"
                   className="leading-none px-4 py-2 h-full"
                   type="text"
-                  placeholder={`${i18n.t("mail_placeholder")}`}
-                  value={email}
-                  onChangeText={(text) => setEmail(text)}
+                  placeholder={`Vui lòng nhập email`}
+                  value={formik.values.email}
+                  onChangeText={formik.handleChange("email")}
                 />
               </Input>
             </TouchableWithoutFeedback>
+
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>{errorText}</FormControlErrorText>
+              <FormControlErrorText>{formik.errors.email}</FormControlErrorText>
+            </FormControlError>
+          </FormControl>
+
+          {/* Birthdate */}
+          <FormControl
+            isInvalid={formik.errors.birthdate ? true : false}
+            size="md"
+            isDisabled={false}
+            isReadOnly={false}
+            isRequired={false}
+          >
+            <FormControlLabel>
+              <FormControlLabelText size="lg" className="text-gray-600">
+                Ngày sinh
+              </FormControlLabelText>
+            </FormControlLabel>
+            <TouchableWithoutFeedback>
+              <Input size="lg" className="flex items-center h-12">
+                <InputSlot className="pl-3 flex items-center">
+                  <InputIcon as={CalendarDaysIcon} size={"lg"} />
+                </InputSlot>
+                <InputField
+                  className="leading-none px-4 py-2 h-full"
+                  type="text"
+                  placeholder={`Vui lòng chọn ngày sinh`}
+                  value={formik.values.birthdate}
+                  onChangeText={formik.handleChange("birthdate")}
+                />
+              </Input>
+            </TouchableWithoutFeedback>
+            <FormControlHelper>
+              <FormControlHelperText>YY-MM-DD</FormControlHelperText>
+            </FormControlHelper>
+            <FormControlError>
+              <FormControlErrorIcon as={AlertCircleIcon} />
+              <FormControlErrorText>
+                {formik.errors.birthdate}
+              </FormControlErrorText>
+            </FormControlError>
+          </FormControl>
+
+          {/* Phone */}
+          <FormControl
+            isInvalid={formik.errors.phone ? true : false}
+            size="md"
+            isDisabled={false}
+            isReadOnly={false}
+            isRequired={false}
+          >
+            <FormControlLabel>
+              <FormControlLabelText size="lg" className="text-gray-600">
+                Số điện thoại
+              </FormControlLabelText>
+            </FormControlLabel>
+            <TouchableWithoutFeedback>
+              <Input size="lg" className="flex items-center h-12">
+                <InputSlot className="pl-3 flex items-center">
+                  <InputIcon as={PhoneIcon} size={"lg"} />
+                </InputSlot>
+                <InputField
+                  className="leading-none px-4 py-2 h-full"
+                  type="text"
+                  placeholder={`Vui lòng nhập email`}
+                  // value={email}
+                  // onChangeText={(text) => setEmail(text)}
+                  value={formik.values.phone}
+                  onChangeText={formik.handleChange("phone")}
+                />
+              </Input>
+            </TouchableWithoutFeedback>
+
+            <FormControlError>
+              <FormControlErrorIcon as={AlertCircleIcon} />
+              <FormControlErrorText>{formik.errors.phone}</FormControlErrorText>
+            </FormControlError>
+          </FormControl>
+
+          {/* Password */}
+          <FormControl
+            isInvalid={formik.errors.password ? true : false}
+            size="md"
+            isDisabled={false}
+            isReadOnly={false}
+            isRequired={false}
+          >
+            <FormControlLabel>
+              <FormControlLabelText size="lg" className="text-gray-600">
+                Mật khẩu
+              </FormControlLabelText>
+            </FormControlLabel>
+            <TouchableWithoutFeedback>
+              <Input size="lg" className="flex items-center h-12">
+                <InputSlot className="pl-3 flex items-center">
+                  <InputIcon as={LockIcon} size={"lg"} />
+                </InputSlot>
+                <InputField
+                  className="leading-none px-4 py-2 h-full"
+                  type="text"
+                  placeholder={`Vui lòng nhập mật khẩu`}
+                  // value={email}
+                  // onChangeText={(text) => setEmail(text)}
+                  value={formik.values.password}
+                  onChangeText={formik.handleChange("password")}
+                />
+              </Input>
+            </TouchableWithoutFeedback>
+
+            <FormControlError>
+              <FormControlErrorIcon as={AlertCircleIcon} />
+              <FormControlErrorText>
+                {formik.errors.password}
+              </FormControlErrorText>
             </FormControlError>
           </FormControl>
 
           {/* Button */}
           <Box className="flex flex-col justify-between">
             {/* Login */}
-            <TouchableWithoutFeedback>
-              <Button
-                className="w-full self-end mt-2 bg-green-500 border-none"
-                size="md"
-                onPress={handleSubmit}
-                variant="solid"
-                action="positive"
-              >
-                {loading && <ButtonSpinner color={"#D1D5DB"} />}
-                <ButtonText size="lg" className="text-white">
-                  {i18n.t("verify")}
-                </ButtonText>
-              </Button>
-            </TouchableWithoutFeedback>
+            <Pressable
+              onPress={() => {
+                formik.handleSubmit();
+              }}
+              className={`w-full h-12 bg-[#0973A8] rounded-lg flex justify-center items-center mt-2 ${
+                isLoading ? "opacity-70" : "opacity-100"
+              }`}
+            >
+              {isLoading && <ActivityIndicator color="#D1D5DB" />}
+              {!isLoading && (
+                <Text className="text-white font-bold text-lg">Đăng ký</Text>
+              )}
+            </Pressable>
 
             {/* You have account */}
-            <Box className="flex flex-row gap-2 items-center mt-4">
-              <Text size="lg" className="text-center">
-                {i18n.t("have_account")}
+            <Box className="flex flex-row items-center gap-2 mt-4 w-full justify-center">
+              <Text size="md" className="text-center">
+                Bạn đã có tài khoản ?
               </Text>
               <Pressable
                 onPress={() => {
                   router.replace("/(auth)/log-in");
                 }}
               >
-                <Text size="lg" className="font-bold color-green-600">
-                  {i18n.t("login")}
+                <Text size="lg" className="font-bold text-[#4D81E7]">
+                  Đăng nhập
                 </Text>
               </Pressable>
             </Box>
-
-            <Box className="mt-3 px-10 w-full flex flex-row items-center justify-center">
-              <Divider className="my-1 w-1/2" />
-              <Text className="text-center px-4">{i18n.t("or")}</Text>
-              <Divider className="my-1 w-1/2" />
-            </Box>
-            {/* Login third party */}
-            <HStack
-              space="md"
-              reversed={false}
-              className="flex justify-center items-center mt-4"
-            >
-              {/* Google */}
-              <TouchableOpacity className="w-full hover:bg-red-500">
-                <Button
-                  variant="outline"
-                  action="secondary"
-                  className="bg-white flex flex-row items-center border border-gray-200 py-5"
-                  isPressed={false}
-                >
-                  <GoogleSvg />
-                  <ButtonText className="h-6 text-black text-lg flex items-center">
-                    Google
-                  </ButtonText>
-                </Button>
-              </TouchableOpacity>
-            </HStack>
           </Box>
         </Box>
-      </View>
+      </Box>
     </TouchableWithoutFeedback>
   );
 };

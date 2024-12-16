@@ -22,15 +22,15 @@ const OnboardItem = ({ item }: Props) => {
     >
       <Image
         source={item.image as ImageSourcePropType}
-        className="w-full h-[300px]"
+        className="w-full h-[300px] rounded-full"
         resizeMode="contain"
       />
       <View className="flex flex-row items-center justify-center w-full mt-10">
-        <Text className="text-black text-3xl font-bold mx-10 text-center">
+        <Text className="text-[#342BD9] text-5xl font-extrabold mx-10 text-center">
           {item.title}
         </Text>
       </View>
-      <Text className="text-md font-JakartaSemiBold text-center text-[#858585] mx-10 mt-3">
+      <Text className="text-xl font-bold text-center text-[#808080] mx-5 mt-3">
         {item.description}
       </Text>
     </View>

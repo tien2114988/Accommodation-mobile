@@ -21,12 +21,7 @@ const Welcome = () => {
     <SafeAreaView className="flex h-full items-center justify-between bg-red-700">
       {/* Onboards */}
       <View className="py-24 bg-white flex items-center justify-between">
-        <View className="flex h- justify-center flex-row gap-2">
-          <Text className="text-black text-3xl font-extrabold">Home</Text>
-          <Text className="text-3xl text-success-600 font-extrabold">
-            Service
-          </Text>
-        </View>
+        
         <Onboarding onboardings={onboardings} />
       </View>
     </SafeAreaView>
