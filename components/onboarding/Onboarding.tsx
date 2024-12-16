@@ -2,17 +2,15 @@ import { OnboardingItem } from "@/types/types";
 import React, { useRef, useState } from "react";
 import { Animated, FlatList, Text, TouchableOpacity, View } from "react-native";
 import OnboardItem from "./OnboardItem";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import Paginator from "./Paginator";
 import { router } from "expo-router";
-
+import { Pressable } from "../ui/pressable";
+import AntDesign from "@expo/vector-icons/AntDesign";
 interface Props {
   onboardings: OnboardingItem[];
 }
 
 const Onboarding = ({ onboardings }: Props) => {
-  
-
   const scrollX = useRef(new Animated.Value(0)).current;
   const [currentIndex, setCurrentIndex] = useState(0);
   const viewableItemsChanged = useRef(
@@ -58,19 +56,21 @@ const Onboarding = ({ onboardings }: Props) => {
               className=""
               onPress={() => {
                 // router.replace('/(auth)/log-in');
-                router.replace('/(customer)/(home)');
+                router.replace("/(auth)/log-in");
                 // router.push(`/(auth)/verify?email=${email}&role=${role}`);
               }}
             >
-              <Text className="text-black text-md p-5 font-normal text-xl">
-                Bỏ qua
-              </Text>
+              <Pressable>
+                <Text className="text-black text-md p-5 font-normal text-xl">
+                  Bỏ qua
+                </Text>
+              </Pressable>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={scrollTo}
-              className="bg-green-500 flex rounded-full w-16 h-16 items-center justify-center"
+              className="bg-[#5517FF] flex rounded-full w-16 h-16 items-center justify-center"
             >
-              <AntDesign name="rightcircleo" size={56} color="white" />
+              <AntDesign name="arrowright" size={48} color="white" />
             </TouchableOpacity>
           </>
         ) : (
@@ -78,10 +78,22 @@ const Onboarding = ({ onboardings }: Props) => {
             <TouchableOpacity
               className=""
               onPress={() => {
-                router.replace('/(auth)/log-in');
+                // router.replace('/(auth)/log-in');
+                router.replace("/(auth)/log-in");
+                // router.push(`/(auth)/verify?email=${email}&role=${role}`);
               }}
             >
-              <Text className="text-white text-lg font-semibold my-4 py-3 px-12 bg-green-600 rounded-full shadow-lg shadow-green-500">
+              <Text className="text-black text-md p-5 font-normal text-xl hidden">
+                Bỏ qua
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className=""
+              onPress={() => {
+                router.replace("/(auth)/log-in");
+              }}
+            >
+              <Text className="text-white items-center text-xl font-semibold h-auto py-3 px-11 bg-[#5517FF] rounded-full shadow-lg shadow-[#5517FF]">
                 Bắt đầu
               </Text>
             </TouchableOpacity>

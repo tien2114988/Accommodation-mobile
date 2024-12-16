@@ -7,62 +7,24 @@ import { FreelancerWorkModel } from "@/types/workTypes";
 
 export interface LoginRequest {
   email: string;
-  role: "FREELANCER" | "CUSTOMER";
-  otp: string;
+  password: string;
 }
 
 export interface LoginResponse {
-  id?: string;
-  jwt?: string;
-  avatar: string;
-  email: string;
-  role: string;
-  dob: Date;
-  name: string;
-  gender: string;
-  status: string;
-  balance: number;
-  phoneNumber: string;
-  reputationPoint: number;
-  googleSub: string;
-  addresses: Address[];
-  bankAccount: BankAccount;
-  freelancerWorkServices: FreelancerWorkModel[];
+  token: string;
 }
 
 export interface SignUpRequest {
-  email: string;
   name: string;
-  role: string;
+  email: string;
+  birthdate: Date;
+  phone: string;
+  password: string;
   otp: string;
 }
 
 export interface SignUpResponse {
-  id?: string;
-  jwt?: string;
-  avatar: string;
-  email: string;
-  role: string;
-  dob: Date;
-  name: string;
-  gender: string;
-  status: string;
-  balance: number;
-  phoneNumber: string;
-  reputationPoint: number;
-  googleSub: string;
-  addresses: Address[];
-  bankAccount: BankAccount;
-}
-
-export interface SendOtpRequest {
-  email: string;
-  role?: string;
-}
-
-export interface VerifyRequest {
-  email: string;
-  otp: string;
+  token: string;
 }
 
 export interface VerifyJwtForUserRequest {
@@ -73,37 +35,16 @@ const baseUrl = "/auth";
 
 const authApi = API.injectEndpoints({
   endpoints: (build) => ({
-    login: build.mutation<Response<User>, LoginRequest>({
+    login: build.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
-        url: `${baseUrl}/logIn`,
+        url: `${baseUrl}/sign-in`,
         method: "POST",
         body: credentials,
       }),
     }),
-    signup: build.mutation<Response<User>, SignUpRequest>({
+    signup: build.mutation<SignUpResponse, SignUpRequest>({
       query: (credentials) => ({
-        url: `${baseUrl}/signUp`,
-        method: "POST",
-        body: credentials,
-      }),
-    }),
-    sendOtp: build.mutation<Response<{}>, SendOtpRequest>({
-      query: (credentials) => ({
-        url: `${baseUrl}/sendOtp`,
-        method: "POST",
-        body: credentials,
-      }),
-    }),
-    verifyOtp: build.mutation<Response<{}>, VerifyRequest>({
-      query: (credentials) => ({
-        url: `${baseUrl}/verifyOtp`,
-        method: "POST",
-        body: credentials,
-      }),
-    }),
-    verifyJwtForUser: build.mutation<Response<User>, VerifyJwtForUserRequest>({
-      query: (credentials) => ({
-        url: `${baseUrl}/verifyJwtForUser`,
+        url: `${baseUrl}/sign-up`,
         method: "POST",
         body: credentials,
       }),
@@ -111,11 +52,5 @@ const authApi = API.injectEndpoints({
   }),
 });
 
-export const {
-  useLoginMutation,
-  useSignupMutation,
-  useSendOtpMutation,
-  useVerifyOtpMutation,
-  useVerifyJwtForUserMutation,
-} = authApi;
+export const { useLoginMutation, useSignupMutation } = authApi;
 export default authApi;

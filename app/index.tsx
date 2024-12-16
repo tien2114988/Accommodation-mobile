@@ -15,7 +15,7 @@ import Loading from '@/components/loading/Loading';
 
 const App = () => {
   // const isAuthenticated = useSelector(selectIsAuthenticated);
-  // // const isAuthenticated = false;
+  const isAuthenticated = false;
   // const dispatch = useDispatch();
   // const [loading, setLoading] = useState(false);
 
@@ -55,12 +55,12 @@ const App = () => {
   //   return <Loading />;
   // }
 
-  // if (isAuthenticated) {
-  //   return <Redirect href={"/(customer)/(home)"} />;
-  // }
+  if (isAuthenticated) {
+    return <Redirect href={"/(customer)/(home)"} />;
+  }
 
   // return <Redirect href="/(auth)/welcome" />;
-  return <Redirect href="/(tabs)/(home)" />;
+  return <Redirect href="/(auth)/welcome" />;
 };
 export const screenOptions = {
   headerShown: false, // Hides the header

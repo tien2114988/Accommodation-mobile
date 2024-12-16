@@ -11,9 +11,6 @@ export default function Layout() {
       <Stack.Screen name="welcome" options={{ headerShown: false }} />
       <Stack.Screen name="log-in" options={{ headerShown: false }} />
       <Stack.Screen name="sign-up" options={{ headerShown: false }} />
-      <Stack.Screen name="verify" options={{ headerShown: true }} />
-      <Stack.Screen name="verify_signup" options={{ headerShown: true }} />
-      <Stack.Screen name="register" options={{ headerShown: true }} />
     </Stack>
   );
 }
