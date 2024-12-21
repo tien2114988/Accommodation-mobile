@@ -15,6 +15,26 @@ export const generateNext7Days = (): Date[] => {
   return dates;
 };
 
+export const timeAgo = (postedAt: string) => {
+  const postedDate = new Date(postedAt);
+  const now = new Date();
+
+  const seconds = Math.floor((now.getTime() - postedDate.getTime()) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (seconds < 60) {
+    return `${seconds} giây trước`;
+  } else if (minutes < 60) {
+    return `${minutes} phút trước`;
+  } else if (hours < 24) {
+    return `${hours} giờ trước`;
+  } else {
+    return `${days} ngày trước`;
+  }
+};
+
 export const getWorkSchedulesByDaysOfWeek = (
   daysOfWeek: string[],
   monthOffset: number,

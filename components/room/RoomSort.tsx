@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
@@ -13,6 +13,7 @@ import {
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper,
   ActionsheetItem,
+  ActionsheetItemText,
 } from '../ui/actionsheet';
 import { Button, ButtonText } from '../ui/button';
 import { Heading } from '../ui/heading';
@@ -28,10 +29,33 @@ import {
 interface Props {
   showActionSheet: boolean;
   mode: string;
+  sortBy: string;
+  setSortBy: (val: string) => void;
   handleClose: () => void;
+  handleSort: () => void;
 }
 
-const RoomSort = ({ showActionSheet, mode, handleClose }: Props) => {
+const RoomSort = ({
+  showActionSheet,
+  mode,
+  sortBy,
+  setSortBy,
+  handleClose,
+  handleSort,
+}: Props) => {
+  const initialRoomSortRef = useRef(sortBy);
+
+  useEffect(() => {
+    if (mode === Mode.SORT) {
+      initialRoomSortRef.current = sortBy;
+    }
+  }, [showActionSheet]);
+
+  const handleCloseAs = () => {
+    setSortBy(initialRoomSortRef.current);
+    handleClose();
+  };
+
   return (
     <Actionsheet
       isOpen={showActionSheet && mode === Mode.SORT}
@@ -42,17 +66,17 @@ const RoomSort = ({ showActionSheet, mode, handleClose }: Props) => {
         <ActionsheetDragIndicatorWrapper>
           <ActionsheetDragIndicator />
         </ActionsheetDragIndicatorWrapper>
-        <ActionsheetItem className="flex justify-center">
+        <ActionsheetItemText className="flex justify-center m-2">
           <Heading>Sắp xếp theo</Heading>
-        </ActionsheetItem>
-        <ActionsheetItem>
+        </ActionsheetItemText>
+        <ActionsheetItem disabled>
           <Divider />
         </ActionsheetItem>
-        <ActionsheetItem>
-          <RadioGroup>
+        <ActionsheetItem disabled>
+          <RadioGroup value={sortBy} onChange={setSortBy}>
             <VStack space="lg">
               <Radio
-                value="QR"
+                value="time"
                 size="lg"
                 isInvalid={false}
                 isDisabled={false}
@@ -70,7 +94,7 @@ const RoomSort = ({ showActionSheet, mode, handleClose }: Props) => {
                 </RadioIndicator>
               </Radio>
               <Radio
-                value="CASH"
+                value="price-desc"
                 size="lg"
                 isInvalid={false}
                 isDisabled={false}
@@ -89,7 +113,7 @@ const RoomSort = ({ showActionSheet, mode, handleClose }: Props) => {
               </Radio>
 
               <Radio
-                value="CASH"
+                value="price-asc"
                 size="lg"
                 isInvalid={false}
                 isDisabled={false}
@@ -109,15 +133,18 @@ const RoomSort = ({ showActionSheet, mode, handleClose }: Props) => {
             </VStack>
           </RadioGroup>
         </ActionsheetItem>
-        <ActionsheetItem>
+        <ActionsheetItem disabled>
           <Divider />
         </ActionsheetItem>
-        <ActionsheetItem className="flex flex-row justify-center items-center">
+        <ActionsheetItem
+          disabled
+          className="flex flex-row justify-center items-center"
+        >
           <VStack className="w-1/2">
             <Button
               action="secondary"
               className="bg-secondary-300"
-              onPress={handleClose}
+              onPress={handleCloseAs}
             >
               <ButtonText>Hủy</ButtonText>
             </Button>
@@ -126,7 +153,7 @@ const RoomSort = ({ showActionSheet, mode, handleClose }: Props) => {
             <Button
               action="positive"
               className="bg-success-300"
-              onPress={handleClose}
+              onPress={handleSort}
             >
               <ButtonText>Áp dụng</ButtonText>
             </Button>

@@ -9,7 +9,6 @@ import {
 } from '@/store/reducers';
 import * as SecureStore from 'expo-secure-store';
 import { LOCAL_STORAGE_JWT_KEY } from '@/constants';
-import { useVerifyJwtForUserMutation } from '@/services';
 import { useDispatch } from 'react-redux';
 import Loading from '@/components/loading/Loading';
 
@@ -56,8 +55,10 @@ const App = () => {
   // }
 
   if (isAuthenticated) {
-    return <Redirect href={"/(customer)/(home)"} />;
+    return <Redirect href={'/(customer)/(home)'} />;
   }
+
+  return <Redirect href={'/(tabs)/(home)'} />;
 
   // return <Redirect href="/(auth)/welcome" />;
   return <Redirect href="/(auth)/welcome" />;

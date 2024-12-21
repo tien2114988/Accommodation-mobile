@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { VStack } from '@/components/ui/vstack';
 import { Divider } from '../ui/divider';
@@ -17,75 +17,197 @@ import { Heading } from '../ui/heading';
 import { Input, InputField, InputIcon, InputSlot } from '../ui/input';
 
 import { SearchIcon } from '../ui/icon';
-
-const locations = [
-  'Thành phố Hồ Chí Minh',
-  'Đồng Nai',
-  'Bình Dương',
-  'Tiền Giang',
-  'Hà Nội',
-  'Bạc Liêu',
-  'Hải Phòng',
-  'Bình Định',
-  'Sóc Trăng',
-  'Hải Dương',
-  'Long An',
-  'Đồng Tháp',
-  'Cà Mau',
-];
+import {
+  useGetDistrictsQuery,
+  useGetProvincesQuery,
+  useGetWardsQuery,
+} from '@/services';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { HStack } from '../ui/hstack';
+import { DistrictModel, ProvinceModel, WardModel } from '@/types/addressTypes';
+import { useDebounce } from '@/utils/helper';
+import { NullPlaceholderHandler } from 'i18n-js';
 
 interface Props {
   showActionSheet: boolean;
   mode: string;
+  address: string;
+  setAddress: (val: string) => void;
+  handleFilterLocation: () => void;
   handleClose: () => void;
 }
 
-const LocationFilter = ({ showActionSheet, mode, handleClose }: Props) => {
+const LocationFilter = ({
+  showActionSheet,
+  mode,
+  address,
+  setAddress,
+  handleFilterLocation,
+  handleClose,
+}: Props) => {
+  const initialAddressRef = useRef(address);
+
+  const [search, setSearch] = useState<string>('');
+  const [currentProvince, setProvince] = useState<ProvinceModel | null>(null);
+  const [currentDistrict, setDistrict] = useState<DistrictModel | null>(null);
+  const [currentWard, setWard] = useState<WardModel | null>(null);
+
+  const { data: provinces } = useGetProvincesQuery();
+  const { data: districts } = useGetDistrictsQuery(
+    currentProvince?.idProvince ?? '',
+  );
+  const { data: wards } = useGetWardsQuery(currentDistrict?.idDistrict ?? '');
+
+  useEffect(() => {
+    if (mode === Mode.LOCATION) {
+      initialAddressRef.current = address;
+    }
+  }, [showActionSheet]);
+
+  const handleCloseAs = () => {
+    setAddress(initialAddressRef.current);
+    setProvince(null);
+    setDistrict(null);
+    setWard(null);
+    handleClose();
+  };
+
+  const handleApply = () => {
+    setProvince(null);
+    setDistrict(null);
+    setWard(null);
+    handleFilterLocation();
+  };
+
+  const chooseProvince = (province: ProvinceModel | null) => {
+    if (province) {
+      setAddress(province.name);
+      setProvince(province);
+    } else {
+      setAddress('Tất cả');
+    }
+  };
+
+  const chooseDistrict = (district: DistrictModel) => {
+    setAddress(address + ', ' + district.name);
+    setDistrict(district);
+  };
+
+  const chooseWard = (ward: WardModel) => {
+    setAddress(
+      currentProvince?.name + ', ' + currentDistrict?.name + ', ' + ward?.name,
+    );
+    setWard(ward);
+  };
+
   return (
     <Actionsheet
       isOpen={showActionSheet && mode === Mode.LOCATION}
-      onClose={handleClose}
+      onClose={handleCloseAs}
     >
       <ActionsheetBackdrop />
       <ActionsheetContent>
         <ActionsheetDragIndicatorWrapper>
           <ActionsheetDragIndicator />
         </ActionsheetDragIndicatorWrapper>
-        <ActionsheetItem className="flex justify-center">
-          <Heading>Tỉnh/Thành phố</Heading>
+
+        <ActionsheetItem disabled className="flex justify-center">
+          <Heading>
+            {currentDistrict
+              ? 'Phường/Xã'
+              : currentProvince
+              ? 'Quận/Huyện'
+              : 'Tỉnh/Thành phố'}
+          </Heading>
         </ActionsheetItem>
-        <ActionsheetItem>
+
+        <ActionsheetItem disabled>
           <Divider />
         </ActionsheetItem>
 
-        <ActionsheetItem>
+        {address && (
+          <ActionsheetItem disabled>
+            <HStack space="xs" className="items-center">
+              <ActionsheetItemText className="text-error-400 text-md">
+                <Ionicons size={20} name="location" />
+              </ActionsheetItemText>
+              <ActionsheetItemText className="text-md w-11/12">
+                Khu vực : {address}
+              </ActionsheetItemText>
+            </HStack>
+          </ActionsheetItem>
+        )}
+
+        {/* <ActionsheetItem disabled>
           <Input variant="outline" size="lg" className="w-full">
             <InputSlot className="pl-3">
               <InputIcon as={SearchIcon} />
             </InputSlot>
-            <InputField className="leading-none" placeholder="Tìm kiếm phòng" />
+            <InputField
+              type="text"
+              value={search}
+              onChangeText={text => setSearch(text)}
+              className="leading-none"
+              placeholder="Tìm kiếm"
+            />
           </Input>
-        </ActionsheetItem>
+        </ActionsheetItem> */}
 
-        <ActionsheetItem>
+        <ActionsheetItem disabled>
           <ScrollView className="max-h-64">
-            {locations.map((location, index) => (
-              <ActionsheetItem key={index}>
-                <ActionsheetItemText size="md">{location}</ActionsheetItemText>
-              </ActionsheetItem>
-            ))}
+            {currentDistrict && wards && wards?.length > 0 ? (
+              wards.map((ward, index) => (
+                <ActionsheetItem key={index} onPress={() => chooseWard(ward)}>
+                  <ActionsheetItemText size="md">
+                    {ward.name}
+                  </ActionsheetItemText>
+                </ActionsheetItem>
+              ))
+            ) : currentProvince && districts && districts.length > 0 ? (
+              districts.map((district, index) => (
+                <ActionsheetItem
+                  key={index}
+                  onPress={() => chooseDistrict(district)}
+                >
+                  <ActionsheetItemText size="md">
+                    {district.name}
+                  </ActionsheetItemText>
+                </ActionsheetItem>
+              ))
+            ) : (
+              <>
+                <ActionsheetItem onPress={() => chooseProvince(null)}>
+                  <ActionsheetItemText size="md">Tất cả</ActionsheetItemText>
+                </ActionsheetItem>
+                {provinces &&
+                  provinces.length > 0 &&
+                  provinces.map((province, index) => (
+                    <ActionsheetItem
+                      key={index}
+                      onPress={() => chooseProvince(province)}
+                    >
+                      <ActionsheetItemText size="md">
+                        {province.name}
+                      </ActionsheetItemText>
+                    </ActionsheetItem>
+                  ))}
+              </>
+            )}
           </ScrollView>
         </ActionsheetItem>
 
-        <ActionsheetItem>
+        <ActionsheetItem disabled>
           <Divider />
         </ActionsheetItem>
-        <ActionsheetItem className="flex flex-row justify-center items-center">
+        <ActionsheetItem
+          disabled
+          className="flex flex-row justify-center items-center"
+        >
           <VStack className="w-1/2">
             <Button
               action="secondary"
               className="bg-secondary-300"
-              onPress={handleClose}
+              onPress={handleCloseAs}
             >
               <ButtonText>Hủy</ButtonText>
             </Button>
@@ -94,7 +216,7 @@ const LocationFilter = ({ showActionSheet, mode, handleClose }: Props) => {
             <Button
               action="positive"
               className="bg-success-300"
-              onPress={handleClose}
+              onPress={handleApply}
             >
               <ButtonText>Áp dụng</ButtonText>
             </Button>

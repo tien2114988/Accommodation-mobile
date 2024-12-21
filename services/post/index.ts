@@ -12,101 +12,98 @@ const baseUrl = '/posts';
 const postApi = API.injectEndpoints({
   endpoints: build => ({
     getPosts: build.query<
-      Response<PostModel[]>,
+      PostModel[],
       {
-        page?: number;
-        size?: number;
-        freelancerId?: string;
+        postType: string;
+        offset?: number;
+        limit?: number;
+        sortBy?: string;
+        roomType?: string;
+        utilities?: string;
+        interior?: string;
+        address?: string;
+        priceFrom?: number;
+        priceTo?: number;
+        name?: string;
       }
     >({
-      query: ({ page, size, freelancerId }) => {
+      query: ({
+        postType,
+        offset,
+        limit,
+        sortBy,
+        roomType,
+        utilities,
+        interior,
+        address,
+        priceFrom,
+        priceTo,
+        name,
+      }) => {
         // Tạo query string từ các tham số truyền vào
         const params = new URLSearchParams();
 
-        if (page !== undefined) {
-          params.append('index', page.toString());
+        params.append('postType', postType);
+
+        if (offset !== undefined) {
+          params.append('offset', offset.toString());
         }
-        if (size !== undefined) {
-          params.append('size', size.toString());
+        if (limit !== undefined) {
+          params.append('limit', limit.toString());
         }
-        if (freelancerId) {
-          params.append('freelancerId', freelancerId);
+        if (sortBy) {
+          params.append('sortBy', sortBy);
         }
+        if (roomType) {
+          params.append('roomType', roomType);
+        }
+        if (utilities) {
+          params.append('utilities', utilities);
+        }
+        if (interior) {
+          params.append('interior', interior);
+        }
+        if (address) {
+          params.append('address', address);
+        }
+        if (priceFrom !== undefined) {
+          params.append('priceFrom', priceFrom.toString());
+        }
+        if (priceTo !== undefined) {
+          params.append('priceTo', priceTo.toString());
+        }
+        if (name) {
+          params.append('name', name);
+        }
+
         // Kết hợp base URL và query string
         return `${baseUrl}?${params.toString()}`;
       },
     }),
 
-    getPostsByCustomerId: build.query<
-      Response<PostModel[]>,
+    getPostById: build.query<
+      PostModel,
       {
-        id: string;
-        page?: number;
-        size?: number;
-        workId?: string;
-        packageName?: string;
+        id: number;
       }
     >({
-      query: ({ id, page, size, workId, packageName }) => {
-        // Tạo query string từ các tham số truyền vào
-        const params = new URLSearchParams();
-
-        if (page !== undefined) {
-          params.append('page', page.toString());
-        }
-        if (size !== undefined) {
-          params.append('size', size.toString());
-        }
-        if (workId) {
-          params.append('workId', workId);
-        }
-        if (packageName) {
-          params.append('packageName', packageName);
-        }
-        // Kết hợp base URL và query string
-        return `${baseUrl}/customers/${id}?${params.toString()}`;
+      query: ({ id }) => {
+        return `${baseUrl}/${id}`;
       },
-      providesTags: (result, error, { id }) => [
-        { type: 'PostsByCustomerId', id },
-      ],
     }),
 
-    getPostsByFreelancerId: build.query<
-      Response<TakePostModel[]>,
+    getPostsByUserId: build.query<
+      PostModel[],
       {
-        id: string;
-        page?: number;
-        size?: number;
-        workId?: string;
-        packageName?: string;
-        workStatus?: string;
+        id: number;
       }
     >({
-      query: ({ id, page, size, workId, packageName, workStatus }) => {
-        // Tạo query string từ các tham số truyền vào
-        const params = new URLSearchParams();
-
-        if (page !== undefined) {
-          params.append('page', page.toString());
-        }
-        if (size !== undefined) {
-          params.append('size', size.toString());
-        }
-        if (workId) {
-          params.append('workId', workId);
-        }
-        if (packageName) {
-          params.append('packageName', packageName);
-        }
-        if (workStatus) {
-          params.append('workStatus', workStatus);
-        }
-        // Kết hợp base URL và query string
-        return `${baseUrl}/freelancers/${id}?${params.toString()}`;
+      query: ({ id }) => {
+        return `/users/${id}${baseUrl}`;
       },
-      providesTags: (result, error, { id }) => [
-        { type: 'TakePostsByFreelancerId', id },
-      ],
+      // providesTags: (result, error, { id }) => [
+      //   { type: 'PostsByCustomerId', id },
+      // ],
     }),
 
     createPost: build.mutation<Response<PostModel>, Partial<CreatePostModel>>({
@@ -135,29 +132,14 @@ const postApi = API.injectEndpoints({
       invalidatesTags: (result, error, takePost) => [
         { type: 'TakePostsByFreelancerId', id: takePost.freelancerId }, // Đánh dấu các cache liên quan cần làm mới
       ],
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        const { data: newPost } = await queryFulfilled; // Lấy dữ liệu trả về từ mutation
-        // Cập nhật cache cho query getPosts
-        dispatch(
-          postApi.util.updateQueryData(
-            'getPosts',
-            { freelancerId: arg.freelancerId },
-            draft => {
-              draft.items = draft.items.filter(
-                item => item.id !== newPost.items.post.id,
-              );
-            },
-          ),
-        );
-      },
     }),
   }),
 });
 
 export const {
-  useGetPostsByCustomerIdQuery,
-  useGetPostsByFreelancerIdQuery,
   useCreatePostMutation,
   useGetPostsQuery,
+  useGetPostByIdQuery,
   useTakePostMutation,
+  useGetPostsByUserIdQuery,
 } = postApi;

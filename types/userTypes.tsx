@@ -5,21 +5,14 @@ export interface AdminModel {
 }
 
 export interface UserModel {
-  id: string;
-  name: string;
+  id: number;
+  firstName: string;
+  lastName: string;
   email: string;
-  avatar: string;
-  balance: string;
-  dob: Date;
-  phoneNumber?: string;
-  reputationPoint?: string;
-  status: 'ACTIVE' | 'PROHIBITIVE';
-  role: 'CUSTOMER' | 'FREELANCER';
-  gender: 'MALE' | 'FEMALE';
-  createdAt: number[];
-  bankAccount?: BankAccountModel;
-  addresses: AddressModel[];
-  freelancerWorkServices: FreelancerWorkModel[];
+  phone: string;
+  birthdate: Date;
+  picture: string;
+  postCount: 0;
 }
 
 export interface BankAccountModel {
