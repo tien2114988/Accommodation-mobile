@@ -1,67 +1,65 @@
-import React, { useEffect, useState } from 'react';
-import { Redirect } from 'expo-router';
-import { Text, View } from 'react-native';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { Redirect } from "expo-router";
+import { Text, View } from "react-native";
+import { useSelector } from "react-redux";
 import {
   authenticateUser,
   selectIsAuthenticated,
   setUser,
-} from '@/store/reducers';
-import * as SecureStore from 'expo-secure-store';
-import { LOCAL_STORAGE_JWT_KEY } from '@/constants';
-import { useDispatch } from 'react-redux';
-import Loading from '@/components/loading/Loading';
+} from "@/store/reducers";
+import * as SecureStore from "expo-secure-store";
+import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
+import { useDispatch } from "react-redux";
+import Loading from "@/components/loading/Loading";
+import { useVerifyJwtForUserMutation } from "@/services";
 
 const App = () => {
   // const isAuthenticated = useSelector(selectIsAuthenticated);
   const isAuthenticated = false;
-  // const dispatch = useDispatch();
-  // const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
   // // Call Api
-  // const [verifyJwtForUser] = useVerifyJwtForUserMutation();
+  const [verifyJwtForUser] = useVerifyJwtForUserMutation();
 
-  // useEffect(() => {
-  //   getToken();
-  // }, []);
+  useEffect(() => {
+    // getToken();
+  }, []);
 
-  // const getToken = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const jwt = await SecureStore.getItemAsync(LOCAL_STORAGE_JWT_KEY);
-  //     if (!jwt) {
-  //       return;
-  //     }
+  const getToken = async () => {
+    try {
+      setLoading(true);
+      const jwt = await SecureStore.getItemAsync(LOCAL_STORAGE_JWT_KEY);
+      if (!jwt) {
+        return;
+      }
 
-  //     const response = await verifyJwtForUser({ jwt });
+      const response = await verifyJwtForUser({ token: jwt });
 
-  //     if (response.error) {
-  //       const message = response.error.data?.message || 'Unknown error';
-  //       console.error(message);
-  //       return;
-  //     } else if (response.data) {
-  //       dispatch(setUser(response.data.items));
-  //       dispatch(authenticateUser(true));
-  //     }
-  //   } catch (error) {
-  //     console.error('Error retrieving token:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+      if (response.error) {
+        const message = response.error.data?.message || "Unknown error";
+        console.error(message);
+        return;
+      } else if (response.data) {
+        dispatch(setUser(response.data));
+        dispatch(authenticateUser(true));
+      }
+    } catch (error) {
+      console.error("Error retrieving token:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // if (loading) {
-  //   return <Loading />;
-  // }
-
-  if (isAuthenticated) {
-    return <Redirect href={'/(customer)/(home)'} />;
+  if (loading) {
+    return <Loading />;
   }
 
-  return <Redirect href={'/(tabs)/(home)'} />;
+  if (!isAuthenticated) {
+    return <Redirect href="/(auth)/welcome" />;
+  }
 
-  // return <Redirect href="/(auth)/welcome" />;
-  return <Redirect href="/(auth)/welcome" />;
+  return <Redirect href={"/(tabs)/(home)"} />;
 };
 export const screenOptions = {
   headerShown: false, // Hides the header

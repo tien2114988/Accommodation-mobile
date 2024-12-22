@@ -21,7 +21,7 @@ import {
   PhoneIcon,
 } from "@/components/ui/icon";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { useSignupMutation } from "@/services";
+import { useSignupMutation, useVerifyJwtForUserMutation } from "@/services";
 import { Link, router } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
@@ -39,11 +39,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Box } from "@/components/ui/box";
 import { formatDate, useDebounce, validateEmail } from "@/utils/helper";
 import { Text } from "@/components/ui/text";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as Yup from "yup";
 import { Form, Formik, useFormik } from "formik";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import * as SecureStore from "expo-secure-store";
+import {
+  Toast,
+  ToastDescription,
+  ToastTitle,
+  useToast,
+} from "@/components/ui/toast";
+import { useDispatch } from "react-redux";
+import { authenticateUser, setUser } from "@/store/reducers";
+import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
 const SignUpSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, "Tên phải có ít nhất 2 ký tự")
@@ -69,10 +78,44 @@ const initialValues = {
   email: "",
   birthdate: formatDate(new Date()),
   password: "",
+  gender: "Nam",
 };
 
 const SignUp = () => {
+  // dispatch
+  const dispatch = useDispatch();
+
   const [showPassword, setShowPassword] = React.useState(false);
+  const toast = useToast();
+  const [toastId, setToastId] = React.useState(0);
+
+  // Toast
+  const showNewToast = (type: string, error: string, message: string) => {
+    const newId = Math.random();
+    setToastId(newId);
+    toast.show({
+      id: newId + "",
+      placement: "top",
+      duration: 3000,
+      render: ({ id }) => {
+        const uniqueToastId = "toast-" + id;
+        return (
+          <Toast
+            nativeID={uniqueToastId}
+            action={`${type}` as any}
+            variant="outline"
+          >
+            <ToastTitle>{error}</ToastTitle>
+            <ToastDescription>{message}</ToastDescription>
+          </Toast>
+        );
+      },
+    });
+  };
+
+  // Call api
+  const [verify] = useVerifyJwtForUserMutation();
+
   // Date
 
   const [date, setDate] = useState(new Date());
@@ -86,19 +129,41 @@ const SignUp = () => {
       console.log("Form submitted with values:", values);
 
       try {
-        return;
-        // const response = await signup({ email, password });
-        // console.log(response);
+        const response = await signup({
+          email: values.email,
+          gender: values.gender,
+          birthdate: values.birthdate as any as Date,
+          name: values.name,
+          password: values.password,
+          phone: values.phone,
+        });
+        console.log(response);
+        if (response.error) {
+          const message =
+            response.error.data.message ||
+            response.error.message ||
+            "Unknown error";
+          showNewToast("error", "Lỗi", message);
+        } else {
+          if (response.data) {
+            const token = response.data.token;
+            await SecureStore.setItemAsync(LOCAL_STORAGE_JWT_KEY, token);
+            dispatch(authenticateUser(true));
 
-        // if (response.error) {
-        //   const message = response.error.data?.message || "Unknown error";
-        //   alert(message);
-        // } else {
-        //   setIsInvalidEmail(false);
-        //   setIsInvalidPassword(false);
-        //   // router.push(`/(auth)/verify?email=${email}&role=${role}`);
-        //   router.push(`/(customer)/(home)`);
-        // }
+            // return
+            try {
+              const res = await verify({ token });
+              // By verify token
+              const user = res.data!;
+              dispatch(authenticateUser(true));
+              dispatch(setUser(user));
+            } catch (error) {
+              router.replace(`/+not-found`);
+              console.error(error);
+            }
+          }
+          router.replace(`/(tabs)/(home)`);
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -250,9 +315,7 @@ const SignUp = () => {
             </FormControlLabel>
             <View className="w-full">
               {!showPicker && (
-                <Pressable
-                  onPress={() => toggleDatepicker()}
-                >
+                <Pressable onPress={() => toggleDatepicker()}>
                   <Input
                     size="lg"
                     className="flex items-center h-12 justify-center"
@@ -404,7 +467,7 @@ const SignUp = () => {
             >
               {isLoading && <ActivityIndicator color="#D1D5DB" />}
               {!isLoading && (
-                <Text className="text-white font-bold text-lg" >Đăng ký</Text>
+                <Text className="text-white font-bold text-lg">Đăng ký</Text>
               )}
             </Pressable>
 

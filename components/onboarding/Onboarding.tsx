@@ -55,16 +55,13 @@ const Onboarding = ({ onboardings }: Props) => {
             <TouchableOpacity
               className=""
               onPress={() => {
-                // router.replace('/(auth)/log-in');
-                router.replace("/(auth)/log-in");
-                // router.push(`/(auth)/verify?email=${email}&role=${role}`);
+                // router.replace("/(auth)/log-in");
+                router.replace("/(tabs)/(home)");
               }}
             >
-              <Pressable>
-                <Text className="text-black text-md p-5 font-normal text-xl">
-                  Bỏ qua
-                </Text>
-              </Pressable>
+              <Text className="text-black text-md p-5 font-normal text-xl">
+                Bỏ qua
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={scrollTo}
@@ -78,9 +75,7 @@ const Onboarding = ({ onboardings }: Props) => {
             <TouchableOpacity
               className=""
               onPress={() => {
-                // router.replace('/(auth)/log-in');
-                router.replace("/(customer)/(home)");
-                // router.push(`/(auth)/verify?email=${email}&role=${role}`);
+                router.replace("/(tabs)/(home)");
               }}
             >
               <Text className="text-black text-md p-5 font-normal text-xl hidden">

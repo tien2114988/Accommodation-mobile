@@ -5,7 +5,7 @@ export default function NotFoundScreen() {
   return (
     <>
       <SafeAreaView>
-        <Text className="text-3xl color-red-500">Not found css</Text>
+        <Text className="text-3xl color-red-500">Not found</Text>
       </SafeAreaView>
     </>
   );
