@@ -1,10 +1,10 @@
-import { createApi } from "@reduxjs/toolkit/query";
-import { API } from "../base";
-import { Address, BankAccount } from "@/types/types";
-import { FreelancerWorkModel } from "@/types/workTypes";
+import { createApi } from '@reduxjs/toolkit/query';
+import { API } from '../base';
+import { Address, BankAccount } from '@/types/types';
+import { FreelancerWorkModel } from '@/types/workTypes';
 
 export interface User {
-  id?: string;
+  id?: number;
   picture: string;
   email: string;
   birthdate: Date;
@@ -15,9 +15,9 @@ export interface User {
 }
 
 const usersApi = API.injectEndpoints({
-  endpoints: (build) => ({
+  endpoints: build => ({
     getUser: build.query<User, string>({
-      query: (id) => `users/${id}`,
+      query: id => `users/${id}`,
     }),
     getUsers: build.query<User[], string>({
       query: () => `users`,

@@ -1,29 +1,29 @@
-import { Button, ButtonText } from "@/components/ui/button";
-import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
-import { selectIsAuthenticated, selectUser, setUser } from "@/store/reducers";
-import { WorkType } from "@/constants";
-import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { Button, ButtonText } from '@/components/ui/button';
+import { LOCAL_STORAGE_JWT_KEY } from '@/constants';
+import { selectIsAuthenticated, selectUser, setUser } from '@/store/reducers';
+import { WorkType } from '@/constants';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   SafeAreaView,
   Image,
   TouchableWithoutFeedback,
-} from "react-native";
-import { useSelector } from "react-redux";
-import * as SecureStore from "expo-secure-store";
-import { Box } from "@/components/ui/box";
-import { VStack } from "@/components/ui/vstack";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { Text } from "@/components/ui/text";
-import { Pressable } from "@/components/ui/pressable";
-import { HStack } from "@/components/ui/hstack";
-import Carousel from "@/components/carousel/Carousel";
-import ListRoom from "@/components/list-room/ListRoom";
-import { useGetAllPostsQuery, useGetPostsQuery } from "@/services/post";
-import Loading from "@/components/loading/Loading";
-import { useDispatch } from "react-redux";
-import { User, useVerifyJwtForUserQuery } from "@/services";
+} from 'react-native';
+import { useSelector } from 'react-redux';
+import * as SecureStore from 'expo-secure-store';
+import { Box } from '@/components/ui/box';
+import { VStack } from '@/components/ui/vstack';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { Text } from '@/components/ui/text';
+import { Pressable } from '@/components/ui/pressable';
+import { HStack } from '@/components/ui/hstack';
+import Carousel from '@/components/carousel/Carousel';
+import ListRoom from '@/components/list-room/ListRoom';
+import { useGetAllPostsQuery, useGetPostsQuery } from '@/services/post';
+import Loading from '@/components/loading/Loading';
+import { useDispatch } from 'react-redux';
+import { User, useVerifyJwtForUserQuery } from '@/services';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -63,7 +63,7 @@ const Home = () => {
     // console.log("Authenticated user:", currentUser);
   }
 
-  console.log("Current User:", currentUser);
+  console.log('Current User:', currentUser);
   // console.log("Token:", token);
 
   return (
@@ -74,7 +74,7 @@ const Home = () => {
           Hôm nay của bạn thế nào
         </Text>
         <Image
-          source={require("@/assets/images/home.png")}
+          source={require('@/assets/images/home.png')}
           className="w-full h-80"
           resizeMode="cover"
         />
@@ -82,7 +82,7 @@ const Home = () => {
 
       {/* Login/Signup */}
 
-      <Box className="absolute top-56 w-[90%] bg-white px-2 py-5 flex flex-col gap-3 border border-gray-400 rounded-xl shadow-md">
+      <Box className="absolute top-11 w-[90%] bg-white px-2 py-5 flex flex-col gap-3 border border-gray-400 rounded-xl shadow-md">
         {/* Hello */}
         <Text size="lg" className="px-2 py-1 font-bold">
           Hãy dùng app ngay hôm nay để tìm kiếm phòng trọ và tìm bạn ở ghép
@@ -94,13 +94,13 @@ const Home = () => {
               <HStack
                 className={`border-2 bg-gray-200 border-green-500 py-2 px-2 w-2/3
                 gap-1 flex flex-row justify-around items-center rounded-lg ${
-                  pressed ? "bg-green-500 shadow-md " : "bg-white"
+                  pressed ? 'bg-green-500 shadow-md ' : 'bg-white'
                 }`}
               >
                 <Text
                   size="md"
                   className={`font-bold text-green-400 max-w-24 text-center
-                   ${pressed ? "text-white" : ""}
+                   ${pressed ? 'text-white' : ''}
                   `}
                 >
                   Đăng nhập
@@ -108,7 +108,7 @@ const Home = () => {
                 <Text
                   size="md"
                   className={`font-bold text-green-400 max-w-24 text-center
-                  ${pressed ? "text-white" : ""}
+                  ${pressed ? 'text-white' : ''}
                  `}
                 >
                   /
@@ -116,7 +116,7 @@ const Home = () => {
                 <Text
                   size="md"
                   className={`font-bold text-green-400  max-w-30 text-center
-                  ${pressed ? "text-white" : ""}
+                  ${pressed ? 'text-white' : ''}
                  `}
                 >
                   Tạo tài khoản
@@ -131,11 +131,11 @@ const Home = () => {
           <Pressable
             className="flex items-center w-1/4"
             onPress={() => {
-              router.push(`/(rooms)/RoomManagement`);
+              router.push(`/(tabs)/(search)`);
             }}
           >
             <Image
-              source={require("@/assets/images/btn1.png")}
+              source={require('@/assets/images/btn1.png')}
               className="w-10 h-10"
               resizeMode="cover"
             />
@@ -146,11 +146,11 @@ const Home = () => {
           <Pressable
             className="flex items-center w-1/4"
             onPress={() => {
-              router.push(`/(rooms)/PairManagement`);
+              router.push(`/(rooms)/PairSearch`);
             }}
           >
             <Image
-              source={require("@/assets/images/btn2.png")}
+              source={require('@/assets/images/btn2.png')}
               className="w-10 h-10"
               resizeMode="cover"
             />
@@ -161,11 +161,11 @@ const Home = () => {
           <Pressable
             className="flex items-center w-1/4"
             onPress={() => {
-              router.push(`/(rooms)/PairSearch`);
+              router.push(`/(rooms)/RoomManagement?type=room`);
             }}
           >
             <Image
-              source={require("@/assets/images/btn3.png")}
+              source={require('@/assets/images/btn3.png')}
               className="w-10 h-10"
               resizeMode="cover"
             />
@@ -176,11 +176,11 @@ const Home = () => {
           <Pressable
             className="flex items-center w-1/4"
             onPress={() => {
-              router.push(`/(rooms)/PairSearch`);
+              router.push(`/(rooms)/RoomManagement?type=pair`);
             }}
           >
             <Image
-              source={require("@/assets/images/btn4.png")}
+              source={require('@/assets/images/btn4.png')}
               className="w-10 h-10"
               resizeMode="cover"
             />

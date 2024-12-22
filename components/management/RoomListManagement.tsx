@@ -1,5 +1,10 @@
-import React from 'react';
-import { FlatList, ListRenderItemInfo, ScrollView } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import {
+  FlatList,
+  ListRenderItemInfo,
+  RefreshControl,
+  ScrollView,
+} from 'react-native';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
@@ -15,9 +20,21 @@ import { timeAgo } from '@/utils/dateUtil';
 
 interface Props {
   rooms: PostModel[];
+  refetch: (options?: {
+    force?: boolean;
+    throwOnError?: boolean;
+  }) => Promise<any>;
 }
 
-const RoomListManagement = ({ rooms }: Props) => {
+const RoomListManagement = ({ rooms, refetch }: Props) => {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    refetch(); // Gọi lại hàm refetch để lấy dữ liệu mới
+    setRefreshing(false); // Đặt lại trạng thái refreshing sau khi hoàn tất
+  }, [refetch]);
+
   const navigateToRoom = (id: number) => {
     router.push(`/(rooms)/Room?id=${id}`);
   };
@@ -71,11 +88,24 @@ const RoomListManagement = ({ rooms }: Props) => {
     );
   };
 
+  if (rooms.length <= 0) {
+    return (
+      <Box className="flex flex-row w-full justify-center items-center">
+        <Text className="text-lg text-secondary-400 text-center py-10">
+          Không có bài đăng
+        </Text>
+      </Box>
+    );
+  }
+
   return (
     <FlatList
       data={rooms}
       renderItem={renderItem}
       keyExtractor={item => item.id.toString()}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     />
   );
 };

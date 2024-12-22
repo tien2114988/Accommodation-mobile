@@ -1,5 +1,5 @@
-import { AddressModel, UserModel } from "./userTypes";
-import { WorkModel } from "./workTypes";
+import { AddressModel, UserModel } from './userTypes';
+import { WorkModel } from './workTypes';
 
 export type RootStackParamList = {
   UpcomingWork: { status: string };
@@ -8,6 +8,12 @@ export type RootStackParamList = {
   NewPost: { status: string };
   RequestPost: { status: string };
 };
+
+export interface ImageModel {
+  uri?: string;
+  type?: string;
+  name?: string;
+}
 
 export interface HouseCleaningOption {
   area: number;
@@ -28,22 +34,20 @@ export interface CreateTakePostModel {
 }
 
 export interface CreatePostModel {
-  customerNote?: string;
-  startTime: string; // ISO 8601 date string
-  duration: number;
+  name: string;
+  description: string;
+  address: string;
   price: number;
-  paymentType: string;
-  totalFreelancer: number;
-  packageName: string;
-  totalWorkDay: number;
-  chooseFreelancer: boolean;
-  houseCleaning?: HouseCleaningModel;
-  babysitting?: BabysittingModel;
-  workSchedules: CreateWorkScheduleModel[];
-  customerId: string;
-  addressId: string;
-  workId: string;
-  payment: boolean;
+  gender?: string;
+  area: number;
+  capacity: number;
+  floor: number;
+  deposit: number;
+  utilities: string;
+  interior: string;
+  roomType: string;
+  postType: string;
+  images?: ImageModel[];
 }
 
 export interface CreateWorkScheduleModel {
@@ -57,7 +61,7 @@ export interface PostModel {
   address: string;
   price: number;
   gender?: string;
-  area: string;
+  area: number;
   capacity: number;
   floor: number;
   deposit: number;
@@ -67,6 +71,7 @@ export interface PostModel {
   postType: string;
   postedAt: string;
   postedBy: UserModel;
+  pictures: string[];
 }
 
 export interface TakePostModel {
