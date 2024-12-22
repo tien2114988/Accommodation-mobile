@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { VStack } from '@/components/ui/vstack';
 import { Text } from '@/components/ui/text';
-
+import Slider from '@react-native-community/slider';
 import { Divider } from '../ui/divider';
 import { Mode } from '@/app/(tabs)/(search)';
 import {
@@ -11,24 +11,42 @@ import {
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper,
   ActionsheetItem,
+  ActionsheetItemText,
 } from '../ui/actionsheet';
 import { Button, ButtonText } from '../ui/button';
 import { Heading } from '../ui/heading';
 import { Input, InputField } from '../ui/input';
-import {
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-} from '../ui/slider';
 
 interface Props {
   showActionSheet: boolean;
   mode: string;
+  priceTo: number;
+  setPriceTo: (val: number) => void;
+  handleFilterPrice: () => void;
   handleClose: () => void;
 }
 
-const PriceFilter = ({ showActionSheet, mode, handleClose }: Props) => {
+const PriceFilter = ({
+  showActionSheet,
+  mode,
+  priceTo,
+  setPriceTo,
+  handleFilterPrice,
+  handleClose,
+}: Props) => {
+  const initialPriceToRef = useRef(priceTo);
+
+  useEffect(() => {
+    if (mode === Mode.PRICE) {
+      initialPriceToRef.current = priceTo;
+    }
+  }, [showActionSheet]);
+
+  const handleCloseAs = () => {
+    setPriceTo(initialPriceToRef.current);
+    handleClose();
+  };
+
   return (
     <Actionsheet
       isOpen={showActionSheet && mode === Mode.PRICE}
@@ -39,34 +57,38 @@ const PriceFilter = ({ showActionSheet, mode, handleClose }: Props) => {
         <ActionsheetDragIndicatorWrapper>
           <ActionsheetDragIndicator />
         </ActionsheetDragIndicatorWrapper>
-        <ActionsheetItem className="flex justify-center">
+        <ActionsheetItemText className="flex justify-center m-2">
           <Heading>Khoảng giá</Heading>
-        </ActionsheetItem>
-        <ActionsheetItem>
+        </ActionsheetItemText>
+        <ActionsheetItem disabled>
           <Divider />
         </ActionsheetItem>
-        <ActionsheetItem>
+
+        <ActionsheetItem disabled>
           <Slider
-            defaultValue={30}
-            size="md"
-            orientation="horizontal"
-            isDisabled={false}
-            isReversed={false}
-          >
-            <SliderTrack>
-              <SliderFilledTrack />
-            </SliderTrack>
-            <SliderThumb className="" />
-          </Slider>
+            style={{ width: '100%', height: 40 }}
+            minimumValue={0}
+            maximumValue={10000000}
+            value={priceTo}
+            step={1000}
+            onSlidingComplete={setPriceTo}
+            minimumTrackTintColor="#ADD8E6"
+            maximumTrackTintColor="#000000"
+            className="w-full h-10"
+          />
         </ActionsheetItem>
-        <ActionsheetItem className="flex flex-row justify-between items-center">
+
+        <ActionsheetItem
+          disabled
+          className="flex flex-row justify-between items-center"
+        >
           <Input
             variant="outline"
             size="lg"
             isDisabled={true}
             className="w-1/3"
           >
-            <InputField className="leading-none" value="1 đ" />
+            <InputField className="leading-none" value="0 đ" />
           </Input>
           <Text>-</Text>
           <Input
@@ -75,18 +97,24 @@ const PriceFilter = ({ showActionSheet, mode, handleClose }: Props) => {
             isDisabled={true}
             className="flex text-center w-1/3"
           >
-            <InputField className="leading-none" value="100.000 đ" />
+            <InputField
+              className="leading-none"
+              value={`${priceTo.toLocaleString()} đ`}
+            />
           </Input>
         </ActionsheetItem>
-        <ActionsheetItem>
+        <ActionsheetItem disabled>
           <Divider />
         </ActionsheetItem>
-        <ActionsheetItem className="flex flex-row justify-center items-center">
+        <ActionsheetItem
+          disabled
+          className="flex flex-row justify-center items-center"
+        >
           <VStack className="w-1/2">
             <Button
               action="secondary"
               className="bg-secondary-300"
-              onPress={handleClose}
+              onPress={handleCloseAs}
             >
               <ButtonText>Hủy</ButtonText>
             </Button>
@@ -95,7 +123,7 @@ const PriceFilter = ({ showActionSheet, mode, handleClose }: Props) => {
             <Button
               action="positive"
               className="bg-success-300"
-              onPress={handleClose}
+              onPress={handleFilterPrice}
             >
               <ButtonText>Áp dụng</ButtonText>
             </Button>

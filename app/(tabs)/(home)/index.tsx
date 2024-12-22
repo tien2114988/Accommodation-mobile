@@ -33,10 +33,10 @@ const Home = () => {
           className="w-fit self-end mt-4"
           size="md"
           onPress={() => {
-            router.push(`/Post?workType=${WorkType.HOUSECLEANING.key}`);
+            router.push(`/(rooms)/RoomManagement`);
           }}
         >
-          <ButtonText>Đăng việc {WorkType.HOUSECLEANING.value}</ButtonText>
+          <ButtonText>Đăng tin cho thuê</ButtonText>
         </Button>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback>
@@ -44,10 +44,21 @@ const Home = () => {
           className="w-fit self-end mt-4"
           size="md"
           onPress={() => {
-            router.push(`/Post?workType=${WorkType.BABYSITTING.key}`);
+            router.push(`/(rooms)/PairManagement`);
           }}
         >
-          <ButtonText>Đăng việc {WorkType.BABYSITTING.value}</ButtonText>
+          <ButtonText>Đăng tin ở ghép</ButtonText>
+        </Button>
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback>
+        <Button
+          className="w-fit self-end mt-4"
+          size="md"
+          onPress={() => {
+            router.push(`/(rooms)/PairSearch`);
+          }}
+        >
+          <ButtonText>Tìm kiếm ở ghép</ButtonText>
         </Button>
       </TouchableWithoutFeedback>
     </View>

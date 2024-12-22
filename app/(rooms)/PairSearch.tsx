@@ -27,6 +27,7 @@ import RoomSkeleton from '@/components/skeleton/RoomSkeleton';
 import { useDebounce } from '@/utils/helper';
 import { useGetProvincesQuery } from '@/services';
 import { DistrictModel, ProvinceModel } from '@/types/addressTypes';
+import { useRouter } from 'expo-router';
 
 export const Mode = {
   ROOMTYPE: 'ROOMTYPE',
@@ -47,7 +48,8 @@ interface FilterType {
   address?: string;
 }
 
-const Search = () => {
+const PairSearch = () => {
+  const router = useRouter();
   const [mode, setMode] = useState<string>('');
   const [showActionSheet, setShowActionSheet] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<string>('time');
@@ -58,7 +60,7 @@ const Search = () => {
   const [interior, setInterior] = useState<string>('');
   const [address, setAddress] = useState<string>('');
 
-  const [params, setParams] = useState<FilterType>({ postType: 'Phòng' });
+  const [params, setParams] = useState<FilterType>({ postType: 'Ở ghép' });
 
   const debounceSearch = useDebounce(name, 1000);
 
@@ -90,6 +92,10 @@ const Search = () => {
       refetch();
     }
   }, [debounceSearch]);
+
+  const handleBack = () => {
+    router.back();
+  };
 
   const handleFilterPrice = () => {
     setParams({ ...params, priceTo });
@@ -133,9 +139,9 @@ const Search = () => {
   return (
     <SafeAreaView className="flex h-full bg-white">
       <Box className="flex flex-row justify-between items-center bg-info-700 p-4">
-        <Pressable onPress={() => handleFilter(Mode.FILTER)}>
+        <Pressable onPress={handleBack}>
           {({ pressed }) => (
-            <Text className={`text-white hidden ${pressed && 'opacity-75'}`}>
+            <Text className={`text-white ${pressed && 'opacity-75'}`}>
               <Ionicons size={24} name="chevron-back-outline" />
             </Text>
           )}
@@ -150,7 +156,7 @@ const Search = () => {
             type="text"
             value={name}
             onChangeText={text => setName(text)}
-            placeholder="Tìm kiếm phòng"
+            placeholder="Tìm kiếm ở ghép"
           />
         </Input>
 
@@ -295,4 +301,4 @@ const Search = () => {
   );
 };
 
-export default Search;
+export default PairSearch;

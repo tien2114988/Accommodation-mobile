@@ -51,29 +51,22 @@ export interface CreateWorkScheduleModel {
 }
 
 export interface PostModel {
-  id: string;
-  createdAt: number[]; // [Year, Month, Day, Hour, Minute, Second, Millisecond]
-  updatedAt: number[];
-  customerNote: string;
-  startTime: string; // HH:mm:ss
-  duration: number; // Duration in minutes
+  id: number;
+  name: string;
+  description: string;
+  address: string;
   price: number;
-  status: string; // e.g., "INITIAL"
-  paymentType: string; // e.g., "QR"
-  totalFreelancer: number;
-  numOfFreelancer: number;
-  packageName: string; // e.g., "_1MONTH"
-  totalWorkDay: number;
-  numOfWorkedDay: number;
-  chooseFreelancer: boolean;
-  customer: UserModel;
-  workSchedules: WorkScheduleModel[];
-  work: WorkModel;
-  houseCleaning: HouseCleaningModel | null;
-  babysitting: BabysittingModel | null;
-  payment: boolean;
-  address: AddressModel;
-  freelancerTakePosts: TakePostModel[];
+  gender?: string;
+  area: string;
+  capacity: number;
+  floor: number;
+  deposit: number;
+  utilities: string;
+  interior: string;
+  roomType: string;
+  postType: string;
+  postedAt: string;
+  postedBy: UserModel;
 }
 
 export interface TakePostModel {
