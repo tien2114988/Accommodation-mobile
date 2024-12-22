@@ -89,7 +89,10 @@ const Home = () => {
         </Text>
         {/* Login */}
         {!isAuthenticated && (
-          <Pressable onPress={() => router.push(`/(auth)/log-in`)}>
+          <Pressable
+            className="px-2"
+            onPress={() => router.push(`/(auth)/log-in`)}
+          >
             {({ pressed }) => (
               <HStack
                 className={`border-2 bg-gray-200 border-green-500 py-2 px-2 w-2/3
