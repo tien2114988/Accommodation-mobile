@@ -21,9 +21,9 @@ import {
   PhoneIcon,
 } from "@/components/ui/icon";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { useSignupMutation, useVerifyJwtForUserMutation } from "@/services";
+import { useSignupMutation, useVerifyJwtForUserQuery } from "@/services";
 import { Link, router } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -114,7 +114,7 @@ const SignUp = () => {
   };
 
   // Call api
-  const [verify] = useVerifyJwtForUserMutation();
+  // const [verify] = useVerifyJwtForUserMutation();
 
   // Date
 
@@ -148,24 +148,15 @@ const SignUp = () => {
           if (response.data) {
             const token = response.data.token;
             await SecureStore.setItemAsync(LOCAL_STORAGE_JWT_KEY, token);
-            dispatch(authenticateUser(true));
 
             // return
-            try {
-              const res = await verify({ token });
-              // By verify token
-              const user = res.data!;
-              dispatch(authenticateUser(true));
-              dispatch(setUser(user));
-            } catch (error) {
-              router.replace(`/+not-found`);
-              console.error(error);
-            }
+            dispatch(authenticateUser(true));
           }
           router.replace(`/(tabs)/(home)`);
         }
       } catch (error) {
         console.error(error);
+        router.replace(`/+not-found`);
       } finally {
         // setLoading(false);
       }

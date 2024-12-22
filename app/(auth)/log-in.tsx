@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/icon";
 import * as SecureStore from "expo-secure-store";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { useLoginMutation, useVerifyJwtForUserMutation } from "@/services";
+import { useLoginMutation, useVerifyJwtForUserQuery } from "@/services";
 import { Link, router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -45,11 +45,12 @@ import {
   ToastTitle,
   useToast,
 } from "@/components/ui/toast";
+import { err } from "react-native-svg/lib/typescript/xml";
 
 const LogIn = () => {
   // dispatch
   const dispatch = useDispatch();
-
+  const { data: user, error, isLoading } = useVerifyJwtForUserQuery();
   // Set Valid
   const [isInvalidEmail, setIsInvalidEmail] = useState(false);
   const [isInvalidPassword, setIsInvalidPassword] = useState(false);
@@ -99,7 +100,7 @@ const LogIn = () => {
 
   // Call Api
   const [login] = useLoginMutation();
-  const [verify] = useVerifyJwtForUserMutation();
+
   const handleSubmit = async () => {
     console.log("submit");
     try {
@@ -137,19 +138,10 @@ const LogIn = () => {
         if (response.data) {
           const token = response.data.token;
           await SecureStore.setItemAsync(LOCAL_STORAGE_JWT_KEY, token);
-          router.replace(`/(tabs)/(home)`);
-          return;
+
           // verify
-          try {
-            const res = await verify({ token });
-            // By verify token
-            const user = res.data!;
-            dispatch(authenticateUser(true));
-            dispatch(setUser(user));
-          } catch (error) {
-            router.replace(`/+not-found`);
-            console.error(error);
-          }
+          // By verify token
+          dispatch(authenticateUser(true));
         }
 
         router.replace(`/(tabs)/(home)`);

@@ -1,6 +1,6 @@
 import { Button, ButtonText } from "@/components/ui/button";
 import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
-import { selectUser } from "@/store/reducers";
+import { selectIsAuthenticated, selectUser, setUser } from "@/store/reducers";
 import { WorkType } from "@/constants";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -22,13 +22,50 @@ import Carousel from "@/components/carousel/Carousel";
 import ListRoom from "@/components/list-room/ListRoom";
 import { useGetAllPostsQuery, useGetPostsQuery } from "@/services/post";
 import Loading from "@/components/loading/Loading";
+import { useDispatch } from "react-redux";
+import { User, useVerifyJwtForUserQuery } from "@/services";
 
 const Home = () => {
+  const dispatch = useDispatch();
+  const { data } = useGetAllPostsQuery();
+  // Redux state
   const currentUser = useSelector(selectUser);
-  // console.log("currentUser", currentUser);
-  const { data, error, isLoading } = useGetAllPostsQuery();
-  const token = SecureStore.getItem(LOCAL_STORAGE_JWT_KEY);
-  if (isLoading) return <Loading />;
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  const [token, setToken] = useState<string | null>(null);
+
+  // Posts query
+  const { data: posts, error, isLoading } = useGetAllPostsQuery();
+
+  const { data: userData, isLoading: userLoading } = useVerifyJwtForUserQuery();
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const storedToken = await SecureStore.getItemAsync(LOCAL_STORAGE_JWT_KEY);
+      setToken(storedToken);
+    };
+
+    fetchToken();
+  }, []);
+
+  useEffect(() => {
+    if (token && userData) {
+      dispatch(setUser(userData)); // Save user data in Redux
+    }
+  }, [token, userData, dispatch]);
+
+  if (isLoading || userLoading) {
+    return <Loading />;
+  }
+
+  // Check if user is authenticated
+  if (isAuthenticated && userData) {
+    // console.log("Authenticated user:", currentUser);
+  }
+
+  console.log("Current User:", currentUser);
+  // console.log("Token:", token);
+
   return (
     <SafeAreaView className="relative h-full flex items-center bg-gray-100">
       {/* Title */}
@@ -51,7 +88,7 @@ const Home = () => {
           Hãy dùng app ngay hôm nay để tìm kiếm phòng trọ và tìm bạn ở ghép
         </Text>
         {/* Login */}
-        {!token && (
+        {!isAuthenticated && (
           <Pressable onPress={() => router.push(`/(auth)/log-in`)}>
             {({ pressed }) => (
               <HStack
@@ -155,7 +192,7 @@ const Home = () => {
       </Box>
 
       {/* List Rooms */}
-      <Box className="w-full h-full flex-1 px-2 mt-32">
+      <Box className="w-full h-full flex-1 px-2 mt-40">
         {/* Title */}
         <Box className="w-full flex flex-row items-center justify-between">
           <Text

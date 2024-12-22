@@ -11,7 +11,6 @@ import * as SecureStore from "expo-secure-store";
 import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
 import { useDispatch } from "react-redux";
 import Loading from "@/components/loading/Loading";
-import { useVerifyJwtForUserMutation } from "@/services";
 
 const App = () => {
   // const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -20,36 +19,35 @@ const App = () => {
   const [loading, setLoading] = useState(false);
 
   // // Call Api
-  const [verifyJwtForUser] = useVerifyJwtForUserMutation();
 
   useEffect(() => {
     // getToken();
   }, []);
 
-  const getToken = async () => {
-    try {
-      setLoading(true);
-      const jwt = await SecureStore.getItemAsync(LOCAL_STORAGE_JWT_KEY);
-      if (!jwt) {
-        return;
-      }
+  // const getToken = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const jwt = await SecureStore.getItemAsync(LOCAL_STORAGE_JWT_KEY);
+  //     if (!jwt) {
+  //       return;
+  //     }
 
-      const response = await verifyJwtForUser({ token: jwt });
+  //     const response = await verifyJwtForUser({ token: jwt });
 
-      if (response.error) {
-        const message = response.error.data?.message || "Unknown error";
-        console.error(message);
-        return;
-      } else if (response.data) {
-        dispatch(setUser(response.data));
-        dispatch(authenticateUser(true));
-      }
-    } catch (error) {
-      console.error("Error retrieving token:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     if (response.error) {
+  //       const message = response.error.data?.message || "Unknown error";
+  //       console.error(message);
+  //       return;
+  //     } else if (response.data) {
+  //       dispatch(setUser(response.data));
+  //       dispatch(authenticateUser(true));
+  //     }
+  //   } catch (error) {
+  //     console.error("Error retrieving token:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   if (loading) {
     return <Loading />;

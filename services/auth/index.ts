@@ -49,19 +49,15 @@ const authApi = API.injectEndpoints({
         body: credentials,
       }),
     }),
-    verifyJwtForUser: build.mutation<User, VerifyJwtForUserRequest>({
-      query: (credentials) => ({
-        url: `${baseUrl}/verifyJwtForUser`,
-        method: "POST",
-        body: credentials,
+    verifyJwtForUser: build.query<User, void>({
+      query: () => ({
+        url: `/users/`,
+        method: "GET",
       }),
     }),
   }),
 });
 
-export const {
-  useLoginMutation,
-  useSignupMutation,
-  useVerifyJwtForUserMutation,
-} = authApi;
+export const { useLoginMutation, useSignupMutation, useVerifyJwtForUserQuery } =
+  authApi;
 export default authApi;

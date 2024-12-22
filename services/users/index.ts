@@ -11,6 +11,7 @@ export interface User {
   name: string;
   gender: string;
   phone: string;
+  postCount: number;
 }
 
 const usersApi = API.injectEndpoints({
