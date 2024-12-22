@@ -63,7 +63,7 @@ const Home = () => {
     // console.log("Authenticated user:", currentUser);
   }
 
-  console.log("Current User:", currentUser);
+  // console.log("Current User:", currentUser);
   // console.log("Token:", token);
 
   return (
@@ -195,7 +195,11 @@ const Home = () => {
       </Box>
 
       {/* List Rooms */}
-      <Box className="w-full h-full flex-1 px-2 mt-40">
+      <Box
+        className={`w-full h-full flex-1 px-2  ${
+          isAuthenticated ? "mt-28" : "mt-40"
+        }`}
+      >
         {/* Title */}
         <Box className="w-full flex flex-row items-center justify-between">
           <Text

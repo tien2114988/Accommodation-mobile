@@ -13,7 +13,7 @@ const Notification = () => {
 
   return (
     <SafeAreaView className="h-full p-4 w-full flex items-center bg-white">
-      <VStack space="4xl" className="h-full flex w-full ">
+      <VStack space="4xl" className="h-full flex w-full p-4">
         {/* Title */}
         <Box className="flex w-full ">
           <Text className="text-2xl font-bold">Hộp thư</Text>
@@ -39,7 +39,7 @@ const Notification = () => {
               </Box>
             </Pressable>
             <Pressable
-              className="w-1/3 bg-green-400"
+              className="w-1/3 "
               onPress={() => setActiveTab("recommend")}
             >
               <Box

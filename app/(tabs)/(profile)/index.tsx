@@ -70,7 +70,7 @@ const Profile = () => {
       )}
       {isAuthenticated && (
         <SafeAreaView className="h-full p-4 w-full flex items-center bg-white">
-          <VStack space="4xl" className="h-full flex ">
+          <VStack space="4xl" className="h-full flex p-4">
             {/* Title */}
             <Box className="flex w-full">
               <Text className="text-2xl font-bold">Thông tin tài khoản</Text>
@@ -159,7 +159,7 @@ const Profile = () => {
               justify-between border-b border-gray-300"
                 >
                   <AntDesign name="home" size={32} color="black" />
-                  <Text className="text-gray-400 text-xl font-medium">
+                  <Text className="text-black text-xl font-medium">
                     Quản lý bài đăng cho thuê phòng
                   </Text>
                   <AntDesign name="arrowright" size={24} color="black" />
@@ -175,7 +175,7 @@ const Profile = () => {
                     size={28}
                     color="black"
                   />
-                  <Text className="text-gray-400 text-xl font-medium">
+                  <Text className="text-black text-xl font-medium">
                     Quản lý bài đăng cho tìm ở ghép
                   </Text>
                   <AntDesign name="arrowright" size={24} color="black" />
@@ -188,7 +188,7 @@ const Profile = () => {
                border border-gray-300 rounded-2xl"
               >
                 <AntDesign name="logout" size={24} color="black" />
-                <Text className="text-gray-400 text-xl font-bold">
+                <Text className="text-black text-xl font-bold">
                   Đăng xuất
                 </Text>
               </Box>

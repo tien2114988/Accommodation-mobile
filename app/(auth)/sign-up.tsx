@@ -28,6 +28,7 @@ import {
   ActivityIndicator,
   Image,
   Keyboard,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
@@ -53,6 +54,7 @@ import {
 import { useDispatch } from "react-redux";
 import { authenticateUser, setUser } from "@/store/reducers";
 import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
+import { ScrollView } from "react-native";
 const SignUpSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, "Tên phải có ít nhất 2 ký tự")
@@ -197,290 +199,308 @@ const SignUp = () => {
   };
 
   return (
-    <TouchableWithoutFeedback
-      className="flex h-full items-center justify-between"
-      onPress={Keyboard.dismiss}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1 w-full" // Ensure the container takes full screen
     >
-      <Box className="flex items-center justify-start h-full bg-white gap-2 px-5">
-        {/* header */}
-        <Box className="p-5 mt-10 flex-start flex-row items-center w-full">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            // className="bg-white flex rounded-full w-16 h-16 items-center justify-center"
-          >
-            <AntDesign name="arrowleft" size={36} color="black" />
-          </TouchableOpacity>
-        </Box>
-        {/* Title */}
-        <Box className="p-5 flex flex-col flex-start w-full">
-          <Text size="5xl" className="text-black w-full font-extrabold">
-            Đăng ký
-          </Text>
-
-          <Text size="lg" className="text-gray-600 w-full font-normal">
-            Tạo tài khoản để đăng nhập
-          </Text>
-        </Box>
-
-        {/* Signup form */}
-        <Box className="p-5 w-full rounded-xl flex gap-2 bg-white">
-          {/* Input */}
-
-          {/* Name */}
-          <FormControl
-            isInvalid={formik.errors.name ? true : false}
-            size="md"
-            isDisabled={false}
-            isReadOnly={false}
-            isRequired={false}
-          >
-            <FormControlLabel>
-              <FormControlLabelText size="lg" className="text-gray-600">
-                Họ và tên
-              </FormControlLabelText>
-            </FormControlLabel>
-            <Input size="lg" className="flex items-center h-12">
-              <InputSlot className="pl-3 flex items-center">
-                <InputIcon as={AtSignIcon} size={"lg"} />
-              </InputSlot>
-              <InputField
-                className="leading-none px-4 py-2 h-full"
-                type="text"
-                placeholder={`Vui lòng nhập họ và tên`}
-                value={formik.values.name}
-                onChangeText={formik.handleChange("name")}
-                // onBlur={formik.handleBlur("name")} // Correct Formik method for onBlur
-              />
-            </Input>
-
-            <FormControlError>
-              <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>{formik.errors.name}</FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-
-          {/* Email */}
-          <FormControl
-            isInvalid={formik.errors.email ? true : false}
-            size="md"
-            isDisabled={false}
-            isReadOnly={false}
-            isRequired={false}
-          >
-            <FormControlLabel>
-              <FormControlLabelText size="lg" className="text-gray-600">
-                Email
-              </FormControlLabelText>
-            </FormControlLabel>
-            <Input size="lg" className="flex items-center h-12">
-              <InputSlot className="pl-3 flex items-center">
-                <InputIcon as={MailIcon} size={"lg"} />
-              </InputSlot>
-              <InputField
-                className="leading-none px-4 py-2 h-full"
-                type="text"
-                placeholder={`Vui lòng nhập email`}
-                value={formik.values.email}
-                onChangeText={formik.handleChange("email")}
-              />
-            </Input>
-
-            <FormControlError>
-              <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>{formik.errors.email}</FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-
-          {/* Birthdate */}
-          <FormControl
-            isInvalid={formik.errors.birthdate ? true : false}
-            size="md"
-            isDisabled={false}
-            isReadOnly={false}
-            isRequired={false}
-          >
-            <FormControlLabel>
-              <FormControlLabelText size="lg" className="text-gray-600">
-                Ngày sinh
-              </FormControlLabelText>
-            </FormControlLabel>
-            <View className="w-full">
-              {!showPicker && (
-                <Pressable onPress={() => toggleDatepicker()}>
-                  <Input
-                    size="lg"
-                    className="flex items-center h-12 justify-center"
-                  >
-                    <InputSlot className="pl-3 flex items-center">
-                      <InputIcon as={CalendarDaysIcon} size={"md"} />
-                    </InputSlot>
-
-                    <InputField
-                      className="leading-none px-4 py-2 h-full"
-                      type="text"
-                      placeholder={`Vui lòng chọn ngày sinh`}
-                      value={date ? formatDate(date) : ""}
-                      // onChangeText={formik.handleChange("birthdate")}
-                      onPressIn={toggleDatepicker}
-                      editable={false}
-                    />
-                  </Input>
-                </Pressable>
-              )}
-              {showPicker && (
-                <DateTimePicker
-                  style={[
-                    {
-                      height: 120,
-                      marginTop: -10,
-                    },
-                  ]}
-                  mode="date"
-                  display="spinner"
-                  value={date}
-                  onChange={onChange}
-                />
-              )}
-              {showPicker && Platform.OS === "ios" && (
-                <View className="flex flex-row justify-center items-center w-full gap-3">
-                  <TouchableOpacity
-                    className="w-1/2 h-12 bg-error-400 rounded-lg flex justify-center items-center mt-2"
-                    onPress={toggleDatepicker}
-                  >
-                    <Text className="text-white font-bold text-lg">Hủy bỏ</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="w-1/2 h-12 bg-success-400 rounded-lg flex justify-center items-center mt-2"
-                    onPress={confirmIOSDate}
-                  >
-                    <Text className="text-white font-bold text-lg">
-                      Xác nhận
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-            <FormControlHelper>
-              {/* <FormControlHelperText>YY-MM-DD</FormControlHelperText> */}
-            </FormControlHelper>
-            <FormControlError>
-              <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>
-                {formik.errors.birthdate}
-              </FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-
-          {/* Phone */}
-          <FormControl
-            isInvalid={formik.errors.phone ? true : false}
-            size="md"
-            isDisabled={false}
-            isReadOnly={false}
-            isRequired={false}
-          >
-            <FormControlLabel>
-              <FormControlLabelText size="lg" className="text-gray-600">
-                Số điện thoại
-              </FormControlLabelText>
-            </FormControlLabel>
-            <Input size="lg" className="flex items-center h-12">
-              <InputSlot className="pl-3 flex items-center">
-                <InputIcon as={PhoneIcon} size={"md"} />
-              </InputSlot>
-              <InputField
-                className="leading-none px-4 py-2 h-full"
-                type="text"
-                placeholder={`Vui lòng nhập số điện thoại`}
-                // value={email}
-                // onChangeText={(text) => setEmail(text)}
-                value={formik.values.phone}
-                onChangeText={formik.handleChange("phone")}
-              />
-            </Input>
-
-            <FormControlError>
-              <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>{formik.errors.phone}</FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-
-          {/* Password */}
-          <FormControl
-            isInvalid={formik.errors.password ? true : false}
-            size="md"
-            isDisabled={false}
-            isReadOnly={false}
-            isRequired={false}
-          >
-            <FormControlLabel>
-              <FormControlLabelText size="lg" className="text-gray-600">
-                Mật khẩu
-              </FormControlLabelText>
-            </FormControlLabel>
-            <Input size="lg" className="flex items-center h-12">
-              <InputSlot className="pl-3 flex items-center">
-                <InputIcon as={LockIcon} size={"lg"} />
-              </InputSlot>
-              <InputField
-                className="leading-none px-4 py-2 h-full"
-                type={showPassword ? "text" : "password"}
-                placeholder={`Vui lòng nhập mật khẩu`}
-                value={formik.values.password}
-                onChangeText={formik.handleChange("password")}
-              />
-              <InputSlot
-                className="pr-3 flex items-center"
-                onPress={handleState}
+      <TouchableWithoutFeedback
+        className="flex h-full items-center justify-between"
+        onPress={Keyboard.dismiss}
+      >
+        <ScrollView className="flex flex-grow h-full w-full">
+          <Box className="flex items-center justify-start h-full bg-white gap-2 px-5">
+            {/* header */}
+            <Box className="p-5 mt-10 flex-start flex-row items-center w-full">
+              <TouchableOpacity
+                onPress={() => router.back()}
+                // className="bg-white flex rounded-full w-16 h-16 items-center justify-center"
               >
-                <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
-              </InputSlot>
-            </Input>
-
-            <FormControlError>
-              <FormControlErrorIcon as={AlertCircleIcon} />
-              <FormControlErrorText>
-                {formik.errors.password}
-              </FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-
-          {/* Button */}
-          <Box className="flex flex-col justify-between">
-            {/* Login */}
-            <Pressable
-              onPress={() => {
-                formik.handleSubmit();
-              }}
-              className={`w-full h-12 bg-[#0973A8] rounded-lg flex justify-center items-center mt-2 ${
-                isLoading ? "opacity-70" : "opacity-100"
-              }`}
-            >
-              {isLoading && <ActivityIndicator color="#D1D5DB" />}
-              {!isLoading && (
-                <Text className="text-white font-bold text-lg">Đăng ký</Text>
-              )}
-            </Pressable>
-
-            {/* You have account */}
-            <Box className="flex flex-row items-center gap-2 mt-4 w-full justify-center">
-              <Text size="md" className="text-center">
-                Bạn đã có tài khoản ?
+                <AntDesign name="arrowleft" size={36} color="black" />
+              </TouchableOpacity>
+            </Box>
+            {/* Title */}
+            <Box className="p-5 flex flex-col flex-start w-full">
+              <Text size="5xl" className="text-black w-full font-extrabold">
+                Đăng ký
               </Text>
-              <Pressable
-                onPress={() => {
-                  router.replace("/(auth)/log-in");
-                }}
+
+              <Text size="lg" className="text-gray-600 w-full font-normal">
+                Tạo tài khoản để đăng nhập
+              </Text>
+            </Box>
+
+            {/* Signup form */}
+            <Box className="p-5 w-full rounded-xl flex gap-2 bg-white">
+              {/* Input */}
+
+              {/* Name */}
+              <FormControl
+                isInvalid={formik.errors.name ? true : false}
+                size="md"
+                isDisabled={false}
+                isReadOnly={false}
+                isRequired={false}
               >
-                <Text size="lg" className="font-bold text-[#4D81E7]">
-                  Đăng nhập
-                </Text>
-              </Pressable>
+                <FormControlLabel>
+                  <FormControlLabelText size="lg" className="text-gray-600">
+                    Họ và tên
+                  </FormControlLabelText>
+                </FormControlLabel>
+                <Input size="lg" className="flex items-center h-12">
+                  <InputSlot className="pl-3 flex items-center">
+                    <InputIcon as={AtSignIcon} size={"lg"} />
+                  </InputSlot>
+                  <InputField
+                    className="leading-none px-4 py-2 h-full"
+                    type="text"
+                    placeholder={`Vui lòng nhập họ và tên`}
+                    value={formik.values.name}
+                    onChangeText={formik.handleChange("name")}
+                    // onBlur={formik.handleBlur("name")} // Correct Formik method for onBlur
+                  />
+                </Input>
+
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    {formik.errors.name}
+                  </FormControlErrorText>
+                </FormControlError>
+              </FormControl>
+
+              {/* Email */}
+              <FormControl
+                isInvalid={formik.errors.email ? true : false}
+                size="md"
+                isDisabled={false}
+                isReadOnly={false}
+                isRequired={false}
+              >
+                <FormControlLabel>
+                  <FormControlLabelText size="lg" className="text-gray-600">
+                    Email
+                  </FormControlLabelText>
+                </FormControlLabel>
+                <Input size="lg" className="flex items-center h-12">
+                  <InputSlot className="pl-3 flex items-center">
+                    <InputIcon as={MailIcon} size={"lg"} />
+                  </InputSlot>
+                  <InputField
+                    className="leading-none px-4 py-2 h-full"
+                    type="text"
+                    placeholder={`Vui lòng nhập email`}
+                    value={formik.values.email}
+                    onChangeText={formik.handleChange("email")}
+                  />
+                </Input>
+
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    {formik.errors.email}
+                  </FormControlErrorText>
+                </FormControlError>
+              </FormControl>
+
+              {/* Birthdate */}
+              <FormControl
+                isInvalid={formik.errors.birthdate ? true : false}
+                size="md"
+                isDisabled={false}
+                isReadOnly={false}
+                isRequired={false}
+              >
+                <FormControlLabel>
+                  <FormControlLabelText size="lg" className="text-gray-600">
+                    Ngày sinh
+                  </FormControlLabelText>
+                </FormControlLabel>
+                <View className="w-full">
+                  {!showPicker && (
+                    <Pressable onPress={() => toggleDatepicker()}>
+                      <Input
+                        size="lg"
+                        className="flex items-center h-12 justify-center"
+                      >
+                        <InputSlot className="pl-3 flex items-center">
+                          <InputIcon as={CalendarDaysIcon} size={"md"} />
+                        </InputSlot>
+
+                        <InputField
+                          className="leading-none px-4 py-2 h-full"
+                          type="text"
+                          placeholder={`Vui lòng chọn ngày sinh`}
+                          value={date ? formatDate(date) : ""}
+                          // onChangeText={formik.handleChange("birthdate")}
+                          onPressIn={toggleDatepicker}
+                          editable={false}
+                        />
+                      </Input>
+                    </Pressable>
+                  )}
+                  {showPicker && (
+                    <DateTimePicker
+                      style={[
+                        {
+                          height: 120,
+                          marginTop: -10,
+                        },
+                      ]}
+                      mode="date"
+                      display="spinner"
+                      value={date}
+                      onChange={onChange}
+                    />
+                  )}
+                  {showPicker && Platform.OS === "ios" && (
+                    <View className="flex flex-row justify-center items-center w-full gap-3">
+                      <TouchableOpacity
+                        className="w-1/2 h-12 bg-error-400 rounded-lg flex justify-center items-center mt-2"
+                        onPress={toggleDatepicker}
+                      >
+                        <Text className="text-white font-bold text-lg">
+                          Hủy bỏ
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        className="w-1/2 h-12 bg-success-400 rounded-lg flex justify-center items-center mt-2"
+                        onPress={confirmIOSDate}
+                      >
+                        <Text className="text-white font-bold text-lg">
+                          Xác nhận
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+                <FormControlHelper>
+                  {/* <FormControlHelperText>YY-MM-DD</FormControlHelperText> */}
+                </FormControlHelper>
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    {formik.errors.birthdate}
+                  </FormControlErrorText>
+                </FormControlError>
+              </FormControl>
+
+              {/* Phone */}
+              <FormControl
+                isInvalid={formik.errors.phone ? true : false}
+                size="md"
+                isDisabled={false}
+                isReadOnly={false}
+                isRequired={false}
+              >
+                <FormControlLabel>
+                  <FormControlLabelText size="lg" className="text-gray-600">
+                    Số điện thoại
+                  </FormControlLabelText>
+                </FormControlLabel>
+                <Input size="lg" className="flex items-center h-12">
+                  <InputSlot className="pl-3 flex items-center">
+                    <InputIcon as={PhoneIcon} size={"md"} />
+                  </InputSlot>
+                  <InputField
+                    className="leading-none px-4 py-2 h-full"
+                    type="text"
+                    placeholder={`Vui lòng nhập số điện thoại`}
+                    // value={email}
+                    // onChangeText={(text) => setEmail(text)}
+                    value={formik.values.phone}
+                    onChangeText={formik.handleChange("phone")}
+                  />
+                </Input>
+
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    {formik.errors.phone}
+                  </FormControlErrorText>
+                </FormControlError>
+              </FormControl>
+
+              {/* Password */}
+              <FormControl
+                isInvalid={formik.errors.password ? true : false}
+                size="md"
+                isDisabled={false}
+                isReadOnly={false}
+                isRequired={false}
+              >
+                <FormControlLabel>
+                  <FormControlLabelText size="lg" className="text-gray-600">
+                    Mật khẩu
+                  </FormControlLabelText>
+                </FormControlLabel>
+                <Input size="lg" className="flex items-center h-12">
+                  <InputSlot className="pl-3 flex items-center">
+                    <InputIcon as={LockIcon} size={"lg"} />
+                  </InputSlot>
+                  <InputField
+                    className="leading-none px-4 py-2 h-full"
+                    type={showPassword ? "text" : "password"}
+                    placeholder={`Vui lòng nhập mật khẩu`}
+                    value={formik.values.password}
+                    onChangeText={formik.handleChange("password")}
+                  />
+                  <InputSlot
+                    className="pr-3 flex items-center"
+                    onPress={handleState}
+                  >
+                    <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
+                  </InputSlot>
+                </Input>
+
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    {formik.errors.password}
+                  </FormControlErrorText>
+                </FormControlError>
+              </FormControl>
+
+              {/* Button */}
+              <Box className="flex flex-col justify-between">
+                {/* Login */}
+                <Pressable
+                  onPress={() => {
+                    formik.handleSubmit();
+                  }}
+                  className={`w-full h-12 bg-[#0973A8] rounded-lg flex justify-center items-center mt-2 ${
+                    isLoading ? "opacity-70" : "opacity-100"
+                  }`}
+                >
+                  {isLoading && <ActivityIndicator color="#D1D5DB" />}
+                  {!isLoading && (
+                    <Text className="text-white font-bold text-lg">
+                      Đăng ký
+                    </Text>
+                  )}
+                </Pressable>
+
+                {/* You have account */}
+                <Box className="flex flex-row items-center gap-2 mt-4 w-full justify-center">
+                  <Text size="md" className="text-center">
+                    Bạn đã có tài khoản ?
+                  </Text>
+                  <Pressable
+                    onPress={() => {
+                      router.replace("/(auth)/log-in");
+                    }}
+                  >
+                    <Text size="lg" className="font-bold text-[#4D81E7]">
+                      Đăng nhập
+                    </Text>
+                  </Pressable>
+                </Box>
+              </Box>
             </Box>
           </Box>
-        </Box>
-      </Box>
-    </TouchableWithoutFeedback>
+          <Box className="bg-white h-full">{/* <Text>abc1</Text> */}</Box>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

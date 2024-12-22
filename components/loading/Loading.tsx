@@ -50,7 +50,7 @@ const Loading = () => {
               },
             ]}
           >
-            Home
+            Accomodation
           </Animated.Text>
 
           {/* Animated "Service" */}
@@ -63,7 +63,7 @@ const Loading = () => {
               },
             ]}
           >
-            Service
+            Seeking
           </Animated.Text>
         </Box>
       </VStack>
