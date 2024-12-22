@@ -1,28 +1,28 @@
-import React, { useEffect } from 'react';
-import { SafeAreaView } from 'react-native';
+import React, { useEffect } from "react";
+import { SafeAreaView } from "react-native";
 
-import { Heading } from '@/components/ui/heading';
-import { Fab, FabIcon, FabLabel } from '@/components/ui/fab';
-import { AddIcon } from '@/components/ui/icon';
-import RoomListManagement from '@/components/management/RoomListManagement';
-import { VStack } from '@/components/ui/vstack';
-import { Box } from '@/components/ui/box';
-import { Toast, ToastTitle, useToast } from '@/components/ui/toast';
-import { useGetPostsByUserIdQuery } from '@/services/post';
-import RoomManagementSkeleton from '@/components/skeleton/RoomManagementSkeleton';
+import { Heading } from "@/components/ui/heading";
+import { Fab, FabIcon, FabLabel } from "@/components/ui/fab";
+import { AddIcon } from "@/components/ui/icon";
+import RoomListManagement from "@/components/management/RoomListManagement";
+import { VStack } from "@/components/ui/vstack";
+import { Box } from "@/components/ui/box";
+import { Toast, ToastTitle, useToast } from "@/components/ui/toast";
+import { useGetPostsByUserIdQuery } from "@/services/post";
+import RoomManagementSkeleton from "@/components/skeleton/RoomManagementSkeleton";
 
 const RoomManagement = () => {
   const toast = useToast();
 
   const { data, error, isFetching } = useGetPostsByUserIdQuery({ id: 1 });
-
+  console.log(data);
   useEffect(() => {
     if (error) {
       toast.show({
-        placement: 'top',
+        placement: "top",
         duration: 3000,
         render: ({ id }) => {
-          const uniqueToastId = 'toast-' + id;
+          const uniqueToastId = "toast-" + id;
           return (
             <Toast nativeID={uniqueToastId} action="error" variant="outline">
               <ToastTitle>Lấy thông tin các bài đăng thất bại</ToastTitle>

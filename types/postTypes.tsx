@@ -1,5 +1,5 @@
-import { AddressModel, UserModel } from './userTypes';
-import { WorkModel } from './workTypes';
+import { AddressModel, UserModel } from "./userTypes";
+import { WorkModel } from "./workTypes";
 
 export type RootStackParamList = {
   UpcomingWork: { status: string };
@@ -95,4 +95,23 @@ export interface BabysittingModel {
 
 export interface BabyModel {
   age: number;
+}
+
+export interface RoomDetailModel {
+  id: number;
+  name: string;
+  description: string;
+  address: string;
+  price: number;
+  gender?: string;
+  area: number;
+  capacity: number;
+  floor: number;
+  deposit: number;
+  utilities: string;
+  interior: string;
+  roomType: string;
+  postType: string;
+  postedAt: string;
+  pictures: string[];
 }

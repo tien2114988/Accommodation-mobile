@@ -21,7 +21,7 @@ import {
   PhoneIcon,
 } from "@/components/ui/icon";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { useSignupMutation } from "@/services";
+import { useSignupMutation, useVerifyJwtForUserQuery } from "@/services";
 import { Link, router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -29,6 +29,7 @@ import {
   Image,
   Keyboard,
   Modal,
+  Platform,
   Pressable,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -36,15 +37,22 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Box } from "@/components/ui/box";
-import { useDebounce, validateEmail } from "@/utils/helper";
+import { formatDate, useDebounce, validateEmail } from "@/utils/helper";
 import { Text } from "@/components/ui/text";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as Yup from "yup";
 import { Form, Formik, useFormik } from "formik";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Calendar } from "react-native-calendars";
-import { Button as ButtonRN } from "react-native";
-
+import DateTimePicker from "@react-native-community/datetimepicker";
+import * as SecureStore from "expo-secure-store";
+import {
+  Toast,
+  ToastDescription,
+  ToastTitle,
+  useToast,
+} from "@/components/ui/toast";
+import { useDispatch } from "react-redux";
+import { authenticateUser, setUser } from "@/store/reducers";
+import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
 const SignUpSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, "Tên phải có ít nhất 2 ký tự")
@@ -68,38 +76,51 @@ const initialValues = {
   name: "",
   phone: "",
   email: "",
-  birthdate: "",
+  birthdate: formatDate(new Date()),
   password: "",
+  gender: "Nam",
 };
 
 const SignUp = () => {
+  // dispatch
+  const dispatch = useDispatch();
+
   const [showPassword, setShowPassword] = React.useState(false);
+  const toast = useToast();
+  const [toastId, setToastId] = React.useState(0);
+
+  // Toast
+  const showNewToast = (type: string, error: string, message: string) => {
+    const newId = Math.random();
+    setToastId(newId);
+    toast.show({
+      id: newId + "",
+      placement: "top",
+      duration: 3000,
+      render: ({ id }) => {
+        const uniqueToastId = "toast-" + id;
+        return (
+          <Toast
+            nativeID={uniqueToastId}
+            action={`${type}` as any}
+            variant="outline"
+          >
+            <ToastTitle>{error}</ToastTitle>
+            <ToastDescription>{message}</ToastDescription>
+          </Toast>
+        );
+      },
+    });
+  };
+
+  // Call api
+  // const [verify] = useVerifyJwtForUserMutation();
+
   // Date
 
+  const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState({
-    day: 1,
-    month: 1,
-    year: 2024,
-  });
 
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  const years = Array.from({ length: 50 }, (_, i) => 2024 - i);
-  
   // Form
   const formik = useFormik({
     initialValues: initialValues,
@@ -108,21 +129,34 @@ const SignUp = () => {
       console.log("Form submitted with values:", values);
 
       try {
-        return;
-        // const response = await signup({ email, password });
-        // console.log(response);
+        const response = await signup({
+          email: values.email,
+          gender: values.gender,
+          birthdate: values.birthdate as any as Date,
+          name: values.name,
+          password: values.password,
+          phone: values.phone,
+        });
+        console.log(response);
+        if (response.error) {
+          const message =
+            response.error.data.message ||
+            response.error.message ||
+            "Unknown error";
+          showNewToast("error", "Lỗi", message);
+        } else {
+          if (response.data) {
+            const token = response.data.token;
+            await SecureStore.setItemAsync(LOCAL_STORAGE_JWT_KEY, token);
 
-        // if (response.error) {
-        //   const message = response.error.data?.message || "Unknown error";
-        //   alert(message);
-        // } else {
-        //   setIsInvalidEmail(false);
-        //   setIsInvalidPassword(false);
-        //   // router.push(`/(auth)/verify?email=${email}&role=${role}`);
-        //   router.push(`/(customer)/(home)`);
-        // }
+            // return
+            dispatch(authenticateUser(true));
+          }
+          router.replace(`/(tabs)/(home)`);
+        }
       } catch (error) {
         console.error(error);
+        router.replace(`/+not-found`);
       } finally {
         // setLoading(false);
       }
@@ -134,10 +168,32 @@ const SignUp = () => {
 
   // Handle
 
+  const toggleDatepicker = () => {
+    setShowPicker(!showPicker);
+  };
+
+  const onChange = ({ type }: any, selectedDate: Date | undefined) => {
+    if (type == "set" && selectedDate) {
+      const currentDate = selectedDate;
+      setDate(currentDate);
+      if (Platform.OS === "android") {
+        toggleDatepicker();
+      }
+      formik.setFieldValue("birthdate", formatDate(currentDate));
+    } else {
+      toggleDatepicker();
+    }
+  };
+
   const handleState = () => {
     setShowPassword((showState) => {
       return !showState;
     });
+  };
+
+  const confirmIOSDate = () => {
+    formik.setFieldValue("birthdate", formatDate(date));
+    toggleDatepicker();
   };
 
   return (
@@ -183,20 +239,19 @@ const SignUp = () => {
                 Họ và tên
               </FormControlLabelText>
             </FormControlLabel>
-            <TouchableWithoutFeedback>
-              <Input size="lg" className="flex items-center h-12">
-                <InputSlot className="pl-3 flex items-center">
-                  <InputIcon as={AtSignIcon} size={"lg"} />
-                </InputSlot>
-                <InputField
-                  className="leading-none px-4 py-2 h-full"
-                  type="text"
-                  placeholder={`Vui lòng nhập họ và tên`}
-                  value={formik.values.name}
-                  onChangeText={formik.handleChange("name")}
-                />
-              </Input>
-            </TouchableWithoutFeedback>
+            <Input size="lg" className="flex items-center h-12">
+              <InputSlot className="pl-3 flex items-center">
+                <InputIcon as={AtSignIcon} size={"lg"} />
+              </InputSlot>
+              <InputField
+                className="leading-none px-4 py-2 h-full"
+                type="text"
+                placeholder={`Vui lòng nhập họ và tên`}
+                value={formik.values.name}
+                onChangeText={formik.handleChange("name")}
+                // onBlur={formik.handleBlur("name")} // Correct Formik method for onBlur
+              />
+            </Input>
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
@@ -217,20 +272,18 @@ const SignUp = () => {
                 Email
               </FormControlLabelText>
             </FormControlLabel>
-            <TouchableWithoutFeedback>
-              <Input size="lg" className="flex items-center h-12">
-                <InputSlot className="pl-3 flex items-center">
-                  <InputIcon as={MailIcon} size={"lg"} />
-                </InputSlot>
-                <InputField
-                  className="leading-none px-4 py-2 h-full"
-                  type="text"
-                  placeholder={`Vui lòng nhập email`}
-                  value={formik.values.email}
-                  onChangeText={formik.handleChange("email")}
-                />
-              </Input>
-            </TouchableWithoutFeedback>
+            <Input size="lg" className="flex items-center h-12">
+              <InputSlot className="pl-3 flex items-center">
+                <InputIcon as={MailIcon} size={"lg"} />
+              </InputSlot>
+              <InputField
+                className="leading-none px-4 py-2 h-full"
+                type="text"
+                placeholder={`Vui lòng nhập email`}
+                value={formik.values.email}
+                onChangeText={formik.handleChange("email")}
+              />
+            </Input>
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
@@ -251,22 +304,64 @@ const SignUp = () => {
                 Ngày sinh
               </FormControlLabelText>
             </FormControlLabel>
-            <TouchableWithoutFeedback>
-              <Input size="lg" className="flex items-center h-12">
-                <InputSlot className="pl-3 flex items-center">
-                  <InputIcon as={CalendarDaysIcon} size={"lg"} />
-                </InputSlot>
-                <InputField
-                  className="leading-none px-4 py-2 h-full"
-                  type="text"
-                  placeholder={`Vui lòng chọn ngày sinh`}
-                  value={formik.values.birthdate}
-                  onChangeText={formik.handleChange("birthdate")}
+            <View className="w-full">
+              {!showPicker && (
+                <Pressable onPress={() => toggleDatepicker()}>
+                  <Input
+                    size="lg"
+                    className="flex items-center h-12 justify-center"
+                  >
+                    <InputSlot className="pl-3 flex items-center">
+                      <InputIcon as={CalendarDaysIcon} size={"md"} />
+                    </InputSlot>
+
+                    <InputField
+                      className="leading-none px-4 py-2 h-full"
+                      type="text"
+                      placeholder={`Vui lòng chọn ngày sinh`}
+                      value={date ? formatDate(date) : ""}
+                      // onChangeText={formik.handleChange("birthdate")}
+                      onPressIn={toggleDatepicker}
+                      editable={false}
+                    />
+                  </Input>
+                </Pressable>
+              )}
+              {showPicker && (
+                <DateTimePicker
+                  style={[
+                    {
+                      height: 120,
+                      marginTop: -10,
+                    },
+                  ]}
+                  mode="date"
+                  display="spinner"
+                  value={date}
+                  onChange={onChange}
                 />
-              </Input>
-            </TouchableWithoutFeedback>
+              )}
+              {showPicker && Platform.OS === "ios" && (
+                <View className="flex flex-row justify-center items-center w-full gap-3">
+                  <TouchableOpacity
+                    className="w-1/2 h-12 bg-error-400 rounded-lg flex justify-center items-center mt-2"
+                    onPress={toggleDatepicker}
+                  >
+                    <Text className="text-white font-bold text-lg">Hủy bỏ</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className="w-1/2 h-12 bg-success-400 rounded-lg flex justify-center items-center mt-2"
+                    onPress={confirmIOSDate}
+                  >
+                    <Text className="text-white font-bold text-lg">
+                      Xác nhận
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
             <FormControlHelper>
-              <FormControlHelperText>YY-MM-DD</FormControlHelperText>
+              {/* <FormControlHelperText>YY-MM-DD</FormControlHelperText> */}
             </FormControlHelper>
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
@@ -289,22 +384,20 @@ const SignUp = () => {
                 Số điện thoại
               </FormControlLabelText>
             </FormControlLabel>
-            <TouchableWithoutFeedback>
-              <Input size="lg" className="flex items-center h-12">
-                <InputSlot className="pl-3 flex items-center">
-                  <InputIcon as={PhoneIcon} size={"lg"} />
-                </InputSlot>
-                <InputField
-                  className="leading-none px-4 py-2 h-full"
-                  type="text"
-                  placeholder={`Vui lòng nhập email`}
-                  // value={email}
-                  // onChangeText={(text) => setEmail(text)}
-                  value={formik.values.phone}
-                  onChangeText={formik.handleChange("phone")}
-                />
-              </Input>
-            </TouchableWithoutFeedback>
+            <Input size="lg" className="flex items-center h-12">
+              <InputSlot className="pl-3 flex items-center">
+                <InputIcon as={PhoneIcon} size={"md"} />
+              </InputSlot>
+              <InputField
+                className="leading-none px-4 py-2 h-full"
+                type="text"
+                placeholder={`Vui lòng nhập số điện thoại`}
+                // value={email}
+                // onChangeText={(text) => setEmail(text)}
+                value={formik.values.phone}
+                onChangeText={formik.handleChange("phone")}
+              />
+            </Input>
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />
@@ -325,22 +418,24 @@ const SignUp = () => {
                 Mật khẩu
               </FormControlLabelText>
             </FormControlLabel>
-            <TouchableWithoutFeedback>
-              <Input size="lg" className="flex items-center h-12">
-                <InputSlot className="pl-3 flex items-center">
-                  <InputIcon as={LockIcon} size={"lg"} />
-                </InputSlot>
-                <InputField
-                  className="leading-none px-4 py-2 h-full"
-                  type="text"
-                  placeholder={`Vui lòng nhập mật khẩu`}
-                  // value={email}
-                  // onChangeText={(text) => setEmail(text)}
-                  value={formik.values.password}
-                  onChangeText={formik.handleChange("password")}
-                />
-              </Input>
-            </TouchableWithoutFeedback>
+            <Input size="lg" className="flex items-center h-12">
+              <InputSlot className="pl-3 flex items-center">
+                <InputIcon as={LockIcon} size={"lg"} />
+              </InputSlot>
+              <InputField
+                className="leading-none px-4 py-2 h-full"
+                type={showPassword ? "text" : "password"}
+                placeholder={`Vui lòng nhập mật khẩu`}
+                value={formik.values.password}
+                onChangeText={formik.handleChange("password")}
+              />
+              <InputSlot
+                className="pr-3 flex items-center"
+                onPress={handleState}
+              >
+                <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
+              </InputSlot>
+            </Input>
 
             <FormControlError>
               <FormControlErrorIcon as={AlertCircleIcon} />

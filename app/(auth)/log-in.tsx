@@ -1,4 +1,4 @@
-import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button';
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import {
   FormControl,
   FormControlError,
@@ -8,7 +8,7 @@ import {
   FormControlHelperText,
   FormControlLabel,
   FormControlLabelText,
-} from '@/components/ui/form-control';
+} from "@/components/ui/form-control";
 import {
   AlertCircleIcon,
   CircleIcon,
@@ -16,11 +16,12 @@ import {
   EyeOffIcon,
   LockIcon,
   MailIcon,
-} from '@/components/ui/icon';
-import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
-import { useLoginMutation } from '@/services';
-import { Link, router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+} from "@/components/ui/icon";
+import * as SecureStore from "expo-secure-store";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { useLoginMutation, useVerifyJwtForUserQuery } from "@/services";
+import { Link, router } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -29,31 +30,70 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Box } from '@/components/ui/box';
-import { useDebounce, validateEmail } from '@/utils/helper';
-import { Text } from '@/components/ui/text';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Box } from "@/components/ui/box";
+import { useDebounce, validateEmail } from "@/utils/helper";
+import { Text } from "@/components/ui/text";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useDispatch } from "react-redux";
+import { authenticateUser, setUser } from "@/store/reducers";
+import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
+import {
+  Toast,
+  ToastDescription,
+  ToastTitle,
+  useToast,
+} from "@/components/ui/toast";
+import { err } from "react-native-svg/lib/typescript/xml";
 
 const LogIn = () => {
+  // dispatch
+  const dispatch = useDispatch();
+  const { data: user, error, isLoading } = useVerifyJwtForUserQuery();
   // Set Valid
   const [isInvalidEmail, setIsInvalidEmail] = useState(false);
   const [isInvalidPassword, setIsInvalidPassword] = useState(false);
-  const [errorEmail, setErrorEmail] = useState<string>('');
-  const [errorPassword, setErrorPassword] = useState<string>('');
+  const [errorEmail, setErrorEmail] = useState<string>("");
+  const [errorPassword, setErrorPassword] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
   // Set form
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const debounceEmail = useDebounce(email, 1000);
+
+  // Toast
+  const toast = useToast();
+  const [toastId, setToastId] = React.useState(0);
+  const showNewToast = (type: string, error: string, message: string) => {
+    const newId = Math.random();
+    setToastId(newId);
+    toast.show({
+      id: newId + "",
+      placement: "top",
+      duration: 3000,
+      render: ({ id }) => {
+        const uniqueToastId = "toast-" + id;
+        return (
+          <Toast
+            nativeID={uniqueToastId}
+            action={`${type}` as any}
+            variant="outline"
+          >
+            <ToastTitle>{error}</ToastTitle>
+            <ToastDescription>{message}</ToastDescription>
+          </Toast>
+        );
+      },
+    });
+  };
 
   // Handle Logic
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleState = () => {
-    setShowPassword(showState => {
+    setShowPassword((showState) => {
       return !showState;
     });
   };
@@ -62,40 +102,52 @@ const LogIn = () => {
   const [login] = useLoginMutation();
 
   const handleSubmit = async () => {
+    console.log("submit");
     try {
       setLoading(true);
-      setErrorEmail('');
-      setErrorPassword('');
+      setErrorEmail("");
+      setErrorPassword("");
       setIsInvalidEmail(false);
       setIsInvalidPassword(false);
 
       // Check Email
       if (!validateEmail(email)) {
         setIsInvalidEmail(true);
-        setErrorEmail('Vui lòng nhập địa chỉ email hợp lệ');
+        setErrorEmail("Vui lòng nhập địa chỉ email hợp lệ");
       }
 
       // Check password
       if (password.length < 8) {
         setIsInvalidPassword(true);
-        setErrorPassword('Nhập mật khẩu lớn hơn 8 kí tự');
+        setErrorPassword("Nhập mật khẩu lớn hơn 8 kí tự");
         return;
       }
-      console.log(email, password);
-      return;
+
       const response = await login({ email, password });
       console.log(response);
 
       if (response.error) {
-        const message = response.error.data?.message || 'Unknown error';
-        alert(message);
+        const message =
+          response.error.data.message ||
+          response.error.message ||
+          "Unknown error";
+        showNewToast("error", "Lỗi", message);
       } else {
         setIsInvalidEmail(false);
         setIsInvalidPassword(false);
-        // router.push(`/(auth)/verify?email=${email}&role=${role}`);
-        router.push(`/(customer)/(home)`);
+        if (response.data) {
+          const token = response.data.token;
+          await SecureStore.setItemAsync(LOCAL_STORAGE_JWT_KEY, token);
+
+          // verify
+          // By verify token
+          dispatch(authenticateUser(true));
+        }
+
+        router.replace(`/(tabs)/(home)`);
       }
     } catch (error) {
+      router.replace(`/+not-found`);
       console.error(error);
     } finally {
       setLoading(false);
@@ -110,13 +162,13 @@ const LogIn = () => {
     ) {
       if (!validateEmail(email)) {
         setIsInvalidEmail(true);
-        setErrorEmail('Vui lòng nhập địa chỉ email hợp lệ');
+        setErrorEmail("Vui lòng nhập địa chỉ email hợp lệ");
       } else {
         setIsInvalidEmail(false);
       }
     } else {
       setIsInvalidEmail(false);
-      setErrorEmail('');
+      setErrorEmail("");
     }
   }, [debounceEmail]);
 
@@ -163,14 +215,14 @@ const LogIn = () => {
             <TouchableWithoutFeedback>
               <Input size="lg" className="my-1 flex items-center h-12">
                 <InputSlot className="pl-3 flex items-center">
-                  <InputIcon as={MailIcon} size={'lg'} />
+                  <InputIcon as={MailIcon} size={"lg"} />
                 </InputSlot>
                 <InputField
                   className="leading-none px-4 py-2 h-full"
                   type="text"
                   placeholder={`Vui lòng Nhập email`}
                   value={email}
-                  onChangeText={text => setEmail(text)}
+                  onChangeText={(text) => setEmail(text)}
                 />
               </Input>
             </TouchableWithoutFeedback>
@@ -197,14 +249,14 @@ const LogIn = () => {
             <TouchableWithoutFeedback>
               <Input size="lg" className="my-1 flex items-center h-12">
                 <InputSlot className="pl-3 flex items-center">
-                  <InputIcon as={LockIcon} size={'lg'} />
+                  <InputIcon as={LockIcon} size={"lg"} />
                 </InputSlot>
                 <InputField
                   className="leading-none px-4 py-2 h-full"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   placeholder={`Vui lòng nhập mật khẩu`}
                   value={password}
-                  onChangeText={text => setPassword(text)}
+                  onChangeText={(text) => setPassword(text)}
                 />
                 <InputSlot
                   className="pr-3 flex items-center"
@@ -227,7 +279,7 @@ const LogIn = () => {
             <Box className="flex flex-row items-center w-full justify-end">
               <Pressable
                 onPress={() => {
-                  router.replace('/(auth)/sign-up');
+                  router.replace("/(auth)/sign-up");
                 }}
               >
                 <Text size="md" className="font-bold text-[#4D81E7]">
@@ -240,7 +292,7 @@ const LogIn = () => {
             <Pressable
               onPress={handleSubmit}
               className={`w-full h-12 bg-[#0973A8] rounded-lg flex justify-center items-center mt-2 ${
-                loading ? 'opacity-70' : 'opacity-100'
+                loading ? "opacity-70" : "opacity-100"
               }`}
             >
               {loading && <ActivityIndicator color="#D1D5DB" />}
@@ -256,7 +308,7 @@ const LogIn = () => {
               </Text>
               <Pressable
                 onPress={() => {
-                  router.push('/(auth)/sign-up');
+                  router.push("/(auth)/sign-up");
                 }}
               >
                 <Text size="lg" className="font-bold text-[#4D81E7]">

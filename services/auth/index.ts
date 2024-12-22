@@ -15,12 +15,12 @@ export interface LoginResponse {
 }
 
 export interface SignUpRequest {
-  name: string;
   email: string;
-  birthdate: Date;
-  phone: string;
   password: string;
-  otp: string;
+  name: string;
+  birthdate: Date;
+  gender: string;
+  phone: string;
 }
 
 export interface SignUpResponse {
@@ -28,7 +28,7 @@ export interface SignUpResponse {
 }
 
 export interface VerifyJwtForUserRequest {
-  jwt: string;
+  token: string;
 }
 
 const baseUrl = "/auth";
@@ -49,8 +49,15 @@ const authApi = API.injectEndpoints({
         body: credentials,
       }),
     }),
+    verifyJwtForUser: build.query<User, void>({
+      query: () => ({
+        url: `/users/`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useSignupMutation } = authApi;
+export const { useLoginMutation, useSignupMutation, useVerifyJwtForUserQuery } =
+  authApi;
 export default authApi;

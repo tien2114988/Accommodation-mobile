@@ -18,10 +18,9 @@ import Loading from "@/components/loading/Loading";
 
 const Welcome = () => {
   return (
-    <SafeAreaView className="flex h-full items-center justify-between bg-red-700">
+    <SafeAreaView className="flex h-full items-center justify-between bg-white">
       {/* Onboards */}
-      <View className="py-24 bg-white flex items-center justify-between">
-        
+      <View className="h-full py-24 bg-white flex items-center justify-between">
         <Onboarding onboardings={onboardings} />
       </View>
     </SafeAreaView>
