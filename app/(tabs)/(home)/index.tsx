@@ -24,6 +24,7 @@ import { useGetAllPostsQuery, useGetPostsQuery } from "@/services/post";
 import Loading from "@/components/loading/Loading";
 import { useDispatch } from "react-redux";
 import { User, useVerifyJwtForUserQuery } from "@/services";
+import RequiredAuthenticationModal from "@/components/authentication/RequiredAuthenticationModal";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -33,7 +34,7 @@ const Home = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const [token, setToken] = useState<string | null>(null);
-
+  const [showModal, setShowModal] = React.useState(!isAuthenticated);
   // Posts query
   const {
     data: posts,
@@ -176,7 +177,11 @@ const Home = () => {
           <Pressable
             className="flex items-center w-1/4"
             onPress={() => {
-              router.push(`/(rooms)/RoomManagement?type=room`);
+              if (!isAuthenticated) {
+                setShowModal(true);
+              } else {
+                router.push(`/(rooms)/RoomManagement?type=room`);
+              }
             }}
           >
             <Image
@@ -191,7 +196,11 @@ const Home = () => {
           <Pressable
             className="flex items-center w-1/4"
             onPress={() => {
-              router.push(`/(rooms)/RoomManagement?type=pair`);
+              if (!isAuthenticated) {
+                setShowModal(true);
+              } else {
+                router.push(`/(rooms)/RoomManagement?type=pair`);
+              }
             }}
           >
             <Image
@@ -235,6 +244,10 @@ const Home = () => {
 
         {/* List room */}
         <ListRoom data={posts!} />
+        <RequiredAuthenticationModal
+          showModal={showModal}
+          setShowModal={setShowModal}
+        />
       </Box>
     </SafeAreaView>
   );

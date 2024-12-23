@@ -204,7 +204,7 @@ const Room = () => {
           <Divider />
           <Pressable
             onPress={() =>
-              router.push(`/(tabs)/(profile)/friend?id=${data?.postedBy.id}`)
+              router.push(`/(friend)/infor?id=${data?.postedBy.id}`)
             }
           >
             {({ pressed }) => (

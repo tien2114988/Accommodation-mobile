@@ -11,6 +11,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useGetUserQuery } from "@/services";
 import { Skeleton } from "@/components/ui/skeleton";
 import RoomSkeleton from "@/components/skeleton/RoomSkeleton";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const Friend = () => {
   const { id } = useLocalSearchParams();
@@ -30,9 +31,9 @@ const Friend = () => {
     <SafeAreaView className="h-full p-4 w-full flex items-center bg-white">
       <VStack space="4xl" className="h-full flex p-4 w-full">
         {/* Title */}
-        <Box className="flex w-full">
+        {/* <Box className="flex w-full">
           <Text className="text-2xl font-bold">Thông tin tài khoản</Text>
-        </Box>
+        </Box> */}
         {/* Avatar */}
         <Box className="w-full flex flex-row items-center gap-2 border border-gray-300  py-2 px-4 rounded-2xl ">
           <Pressable>
@@ -67,14 +68,24 @@ const Friend = () => {
           {/* Giới tính - Ngày sinh */}
           <HStack className="w-full flex items-center gap-2 justify-between border-b border-gray-300  py-3 px-5">
             <Box className="flex flex-row items-center gap-4">
-              <Fontisto name="intersex" size={32} color="black" />
+              {/* <Fontisto name="intersex" size={32} color="black" /> */}
+              {currentUser?.gender === "Nam" ? (
+                <Ionicons name="male" size={32} color="#5AC1F2" />
+              ) : (
+                <Ionicons name="female" size={32} color="pink" />
+              )}
+
               <Box className="flex flex-col justify-center ">
                 <Text className="text-base font-nomral">Giới tính:</Text>
                 <Text className="text-lg"> {currentUser?.gender}</Text>
               </Box>
             </Box>
             <Box className="flex flex-row items-center gap-4">
-              <AntDesign name="calendar" size={32} color="black" />
+              <Ionicons
+                name="calendar-number-outline"
+                size={32}
+                color="#A0ACC6"
+              />
               <Box className="flex flex-col justify-center">
                 <Text className="text-base font-nomral">Ngày sinh</Text>
                 <Text className="text-lg">
@@ -88,7 +99,7 @@ const Friend = () => {
           {/* Email */}
           <HStack className="w-full flex items-center gap-2 justify-between  py-3 px-5 border-b border-gray-300">
             <Box className="w-full flex flex-row items-center gap-4 ">
-              <Fontisto name="email" size={32} color="black" />
+              <Ionicons name="mail-outline" size={32} color="#df1f00" />
               <Box className="flex flex-col justify-center">
                 <Text className="text-gray-400 text-bawse font-nomral">
                   Email
@@ -101,7 +112,7 @@ const Friend = () => {
           {/* Phone number */}
           <HStack className="w-full flex items-center gap-2 justify-between py-3 px-5">
             <Box className="flex flex-row items-center gap-4">
-              <AntDesign name="phone" size={32} color="black" />
+              <Ionicons name="call-outline" size={32} color="#6cb454" />
               <Box className="flex flex-col justify-center">
                 <Text className="text-gray-400 text-bawse font-nomral">
                   Số điện thoại
@@ -119,7 +130,11 @@ const Friend = () => {
               className="w-full p-4 flex flex-row items-center gap-1 
               justify-between border-b border-gray-300"
             >
-              <AntDesign name="home" size={32} color="black" />
+              <Image
+                source={require("@/assets/images/btn1.png")}
+                className="w-10 h-10"
+                resizeMode="cover"
+              />
               <Text className="text-black text-xl font-medium">
                 Bài đăng cho thuê phòng
               </Text>
@@ -131,7 +146,11 @@ const Friend = () => {
               className="w-full p-4 flex flex-row items-center gap-1
               justify-between "
             >
-              <FontAwesome6 name="users-viewfinder" size={28} color="black" />
+              <Image
+                source={require("@/assets/images/btn2.png")}
+                className="w-10 h-10"
+                resizeMode="cover"
+              />
               <Text className="text-black text-xl font-medium">
                 Bài đăng cho tìm ở ghép
               </Text>

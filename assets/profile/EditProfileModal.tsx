@@ -124,13 +124,7 @@ const EditProfileModal = React.memo(
                 <Heading size="md" className="text-typography-950">
                   Thay đổi ảnh đại diện
                 </Heading>
-                <ModalCloseButton>
-                  <Icon
-                    as={CloseIcon}
-                    size="md"
-                    className="stroke-background-400 group-[:hover]/modal-close-button:stroke-background-700 group-[:active]/modal-close-button:stroke-background-900 group-[:focus-visible]/modal-close-button:stroke-background-900"
-                  />
-                </ModalCloseButton>
+                <ModalCloseButton></ModalCloseButton>
               </ModalHeader>
               <ModalBody>
                 <ModalBody>

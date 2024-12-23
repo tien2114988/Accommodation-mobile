@@ -24,6 +24,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import EditProfileModal from "@/assets/profile/EditProfileModal";
 import { persistStore } from "redux-persist";
 import { persistor, store } from "@/store";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 function extractDate(timestamp: any) {
   return timestamp.split("T")[0];
@@ -119,7 +120,7 @@ const Profile = () => {
                 <Pressable
                   onPress={() => router.push("/(tabs)/(profile)/edit-profile")}
                 >
-                  <AntDesign name="edit" size={24} color="black" />
+                  <Ionicons name="pencil-outline" size={24} color="black" />
                 </Pressable>
               </Box>
             </Box>
@@ -128,14 +129,22 @@ const Profile = () => {
               {/* Giới tính - Ngày sinh */}
               <HStack className="w-full flex items-center gap-2 justify-between border-b border-gray-300  py-3 px-5">
                 <Box className="flex flex-row items-center gap-4">
-                  <Fontisto name="intersex" size={32} color="black" />
+                  {currentUser?.gender === "Nam" ? (
+                    <Ionicons name="male" size={32} color="#5AC1F2" />
+                  ) : (
+                    <Ionicons name="female" size={32} color="pink" />
+                  )}
                   <Box className="flex flex-col justify-center ">
                     <Text className="text-base font-nomral">Giới tính:</Text>
                     <Text className="text-lg"> {currentUser?.gender}</Text>
                   </Box>
                 </Box>
                 <Box className="flex flex-row items-center gap-4">
-                  <AntDesign name="calendar" size={32} color="black" />
+                  <Ionicons
+                    name="calendar-number-outline"
+                    size={32}
+                    color="#E8ADB6"
+                  />
                   <Box className="flex flex-col justify-center">
                     <Text className="text-base font-nomral">Ngày sinh</Text>
                     <Text className="text-lg">
@@ -149,7 +158,7 @@ const Profile = () => {
               {/* Email */}
               <HStack className="w-full flex items-center gap-2 justify-between  py-3 px-5 border-b border-gray-300">
                 <Box className="w-full flex flex-row items-center gap-4 ">
-                  <Fontisto name="email" size={32} color="black" />
+                  <Ionicons name="mail-outline" size={32} color="#df1f00" />
                   <Box className="flex flex-col justify-center">
                     <Text className="text-gray-400 text-bawse font-nomral">
                       Email
@@ -162,7 +171,7 @@ const Profile = () => {
               {/* Phone number */}
               <HStack className="w-full flex items-center gap-2 justify-between py-3 px-5">
                 <Box className="flex flex-row items-center gap-4">
-                  <AntDesign name="phone" size={32} color="black" />
+                  <Ionicons name="call-outline" size={32} color="#6cb454" />
                   <Box className="flex flex-col justify-center">
                     <Text className="text-gray-400 text-bawse font-nomral">
                       Số điện thoại
@@ -180,7 +189,12 @@ const Profile = () => {
                   className="w-full p-4 flex flex-row items-center gap-1 
               justify-between border-b border-gray-300"
                 >
-                  <AntDesign name="home" size={32} color="black" />
+                  <Image
+                    source={require("@/assets/images/btn1.png")}
+                    className="w-10 h-10"
+                    resizeMode="cover"
+                    alt="Quan ly bai dang cho thue phong"
+                  />
                   <Text className="text-black text-xl font-medium">
                     Quản lý bài đăng cho thuê phòng
                   </Text>
@@ -192,10 +206,11 @@ const Profile = () => {
                   className="w-full p-4 flex flex-row items-center gap-1
               justify-between "
                 >
-                  <FontAwesome6
-                    name="users-viewfinder"
-                    size={28}
-                    color="black"
+                  <Image
+                    source={require("@/assets/images/btn2.png")}
+                    className="w-10 h-10"
+                    resizeMode="cover"
+                    alt="Quan ly bai dang o ghep"
                   />
                   <Text className="text-black text-xl font-medium">
                     Quản lý bài đăng cho tìm ở ghép
