@@ -1,32 +1,32 @@
-import { View, Text, SafeAreaView, Alert } from "react-native";
-import React, { useEffect, useState } from "react";
-import { Button, ButtonText } from "@/components/ui/button";
+import { View, Text, SafeAreaView, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Button, ButtonText } from '@/components/ui/button';
 import {
   clearAuthState,
   selectIsAuthenticated,
   selectUser,
   setUser,
-} from "@/store/reducers";
-import { useDispatch } from "react-redux";
-import * as SecureStore from "expo-secure-store";
-import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
-import { useSelector } from "react-redux";
-import RequiredAuthenticationModal from "@/components/authentication/RequiredAuthenticationModal";
-import { router, useFocusEffect } from "expo-router";
-import { Box } from "@/components/ui/box";
-import { Image } from "@/components/ui/image";
-import { HStack } from "@/components/ui/hstack";
-import { VStack } from "@/components/ui/vstack";
-import Fontisto from "@expo/vector-icons/Fontisto";
-import { Pressable } from "@/components/ui/pressable";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import EditProfileModal from "@/assets/profile/EditProfileModal";
-import { persistStore } from "redux-persist";
-import { persistor, store } from "@/store";
+} from '@/store/reducers';
+import { useDispatch } from 'react-redux';
+import * as SecureStore from 'expo-secure-store';
+import { LOCAL_STORAGE_JWT_KEY } from '@/constants';
+import { useSelector } from 'react-redux';
+import RequiredAuthenticationModal from '@/components/authentication/RequiredAuthenticationModal';
+import { router, useFocusEffect } from 'expo-router';
+import { Box } from '@/components/ui/box';
+import { Image } from '@/components/ui/image';
+import { HStack } from '@/components/ui/hstack';
+import { VStack } from '@/components/ui/vstack';
+import Fontisto from '@expo/vector-icons/Fontisto';
+import { Pressable } from '@/components/ui/pressable';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import EditProfileModal from '@/assets/profile/EditProfileModal';
+import { persistStore } from 'redux-persist';
+import { persistor, store } from '@/store';
 
 function extractDate(timestamp: any) {
-  return timestamp.split("T")[0];
+  return timestamp.split('T')[0];
 }
 
 const Profile = () => {
@@ -41,10 +41,10 @@ const Profile = () => {
     persistor.purge();
 
     dispatch(setUser(null));
-    await SecureStore.deleteItemAsync("jwt");
+    await SecureStore.deleteItemAsync('jwt');
     // console.log("JWT successfully deleted.");
     setShowModal(false);
-    router.replace("/(tabs)/(home)");
+    router.replace('/(tabs)/(home)');
   };
 
   useEffect(() => {
@@ -59,7 +59,7 @@ const Profile = () => {
       } else {
         setShowModal(true); // Show the modal if not authenticated
       }
-    }, [isAuthenticated])
+    }, [isAuthenticated]),
   );
 
   return (
@@ -117,7 +117,7 @@ const Profile = () => {
                   {currentUser?.name}
                 </Text>
                 <Pressable
-                  onPress={() => router.push("/(tabs)/(profile)/edit-profile")}
+                  onPress={() => router.push('/(tabs)/(profile)/edit-profile')}
                 >
                   <AntDesign name="edit" size={24} color="black" />
                 </Pressable>
@@ -139,7 +139,7 @@ const Profile = () => {
                   <Box className="flex flex-col justify-center">
                     <Text className="text-base font-nomral">Ngày sinh</Text>
                     <Text className="text-lg">
-                      {" "}
+                      {' '}
                       {currentUser?.birthdate.toString().substring(0, 10)}
                       {/* {extractDate(currentUser?.birthdate?.toString())} */}
                     </Text>
@@ -175,7 +175,7 @@ const Profile = () => {
 
             {/* Button */}
             <VStack className="w-full border border-gray-300 rounded-2xl">
-              <Pressable onPress={() => router.push("/(rooms)/RoomManagement")}>
+              <Pressable onPress={() => router.push('/(rooms)/RoomManagement')}>
                 <Box
                   className="w-full p-4 flex flex-row items-center gap-1 
               justify-between border-b border-gray-300"
@@ -187,7 +187,7 @@ const Profile = () => {
                   <AntDesign name="arrowright" size={24} color="black" />
                 </Box>
               </Pressable>
-              <Pressable onPress={() => router.push("/(rooms)/PairSearch")}>
+              <Pressable onPress={() => router.push('/(rooms)/PairSearch')}>
                 <Box
                   className="w-full p-4 flex flex-row items-center gap-1
               justify-between "

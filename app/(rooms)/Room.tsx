@@ -1,46 +1,109 @@
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect } from "react";
-import { Pressable, SafeAreaView, ScrollView } from "react-native";
-import { Box } from "@/components/ui/box";
-import { useGetPostByIdQuery } from "@/services/post";
-import { Toast, ToastTitle, useToast } from "@/components/ui/toast";
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Pressable, SafeAreaView, ScrollView } from 'react-native';
+import { Box } from '@/components/ui/box';
+import {
+  useDeletePostMutation,
+  useGetPostByIdQuery,
+  useGetPostsByUserIdQuery,
+} from '@/services/post';
+import {
+  Toast,
+  ToastDescription,
+  ToastTitle,
+  useToast,
+} from '@/components/ui/toast';
 
-import { Image } from "@/components/ui/image";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
-import { HStack } from "@/components/ui/hstack";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { Divider } from "@/components/ui/divider";
-import { Grid, GridItem } from "@/components/ui/grid";
-import { stringToArray } from "@/utils/stringUtil";
-import RoomDetailSkeleton from "@/components/skeleton/RoomDetailSkeleton";
-import { useSelector } from "react-redux";
-import { selectUser } from "@/store/reducers";
+import { Image } from '@/components/ui/image';
+import { Text } from '@/components/ui/text';
+import { VStack } from '@/components/ui/vstack';
+import { HStack } from '@/components/ui/hstack';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { Divider } from '@/components/ui/divider';
+import { Grid, GridItem } from '@/components/ui/grid';
+import { stringToArray } from '@/utils/stringUtil';
+import RoomDetailSkeleton from '@/components/skeleton/RoomDetailSkeleton';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/store/reducers';
+import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button';
 
 const room = {
   thumbnail:
-    "https://www.xotels.com/wp-content/uploads/2022/07/Executive-Room-XOTELS.webp",
+    'https://www.xotels.com/wp-content/uploads/2022/07/Executive-Room-XOTELS.webp',
   title:
-    "Cần tìm nam ở ghép, trọn gói 1 triệu cả để xe, điện nước, gần trường đại học Nông Lâm",
-  type: "Chung cư mini",
+    'Cần tìm nam ở ghép, trọn gói 1 triệu cả để xe, điện nước, gần trường đại học Nông Lâm',
+  type: 'Chung cư mini',
   price: 1600000,
-  location: "Phường 8, Quận 10, Thành phố Hồ Chí Minh",
-  phoneNumber: "0346066323",
+  location: 'Phường 8, Quận 10, Thành phố Hồ Chí Minh',
+  phoneNumber: '0346066323',
 };
 
 const Room = () => {
   const user = useSelector(selectUser);
-  const { id } = useLocalSearchParams();
+  const { id, manage } = useLocalSearchParams();
   const { data, error, isFetching } = useGetPostByIdQuery({ id: +id });
+  const [deletePost, { error: deleteError, isLoading }] =
+    useDeletePostMutation();
+  const { refetch } = useGetPostsByUserIdQuery({
+    id: user?.id,
+    postType: data?.postType ?? 'Phòng',
+  });
   const toast = useToast();
+  const router = useRouter();
+
+  const [imageIndex, setImageIndex] = useState<number>(0);
+
+  const navigateToAccount = () => {
+    if (data?.postedBy.id === user?.id) {
+      router.push('/(tabs)/(profile)/profile');
+    } else {
+      router.push(`/(tabs)/(profile)/friend?id=${data?.postedBy.id}`);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    const res = await deletePost(+id);
+    console.info({ res, error });
+    if (!error) {
+      toast.show({
+        placement: 'top',
+        duration: 3000,
+        render: ({ id }) => {
+          const uniqueToastId = 'toast-' + id;
+          return (
+            <Toast nativeID={uniqueToastId} action="success" variant="outline">
+              <ToastTitle>Xóa phòng thành công</ToastTitle>
+              {/* <ToastDescription>{}</ToastDescription> */}
+            </Toast>
+          );
+        },
+      });
+      refetch();
+      router.back();
+    } else {
+      toast.show({
+        placement: 'top',
+        duration: 3000,
+        render: ({ id }) => {
+          const uniqueToastId = 'toast-' + id;
+          return (
+            <Toast nativeID={uniqueToastId} action="error" variant="outline">
+              <ToastTitle>Xóa phòng thất bại</ToastTitle>
+              {/* <ToastDescription>{}</ToastDescription> */}
+            </Toast>
+          );
+        },
+      });
+    }
+  };
 
   useEffect(() => {
     if (error) {
       toast.show({
-        placement: "top",
+        placement: 'top',
         duration: 3000,
         render: ({ id }) => {
-          const uniqueToastId = "toast-" + id;
+          const uniqueToastId = 'toast-' + id;
           return (
             <Toast nativeID={uniqueToastId} action="error" variant="outline">
               <ToastTitle>
@@ -65,20 +128,43 @@ const Room = () => {
           <Image
             size="2xl"
             source={{
-              uri:
-                data && data.pictures.length > 0
-                  ? "https://accomodation-seeking-backend.onrender.com/pictures/" +
-                    data.pictures[0]
-                  : "https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg",
+              uri: data?.pictures[imageIndex]
+                ? 'https://accomodation-seeking-backend.onrender.com/pictures/' +
+                  data?.pictures[imageIndex]
+                : 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg',
             }}
             alt="image"
-            className="rounded-lg w-full"
+            className="rounded-lg w-full h-80"
           />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <HStack space="lg">
+              {data &&
+                data.pictures.length > 1 &&
+                data.pictures.map((img, i) => (
+                  <Pressable key={i} onPress={() => setImageIndex(i)}>
+                    {({ pressed }) => (
+                      <Image
+                        size="lg"
+                        source={{
+                          uri:
+                            'https://accomodation-seeking-backend.onrender.com/pictures/' +
+                            img,
+                        }}
+                        alt="image"
+                        className={`rounded-lg ${pressed && 'opacity-75'} ${
+                          i === imageIndex && 'border-2 border-info-400'
+                        }`}
+                      />
+                    )}
+                  </Pressable>
+                ))}
+            </HStack>
+          </ScrollView>
           <Box className="flex flex-row justify-between items-center">
             <Text className="w-1/2 text-tertiary-500">• {data?.roomType}</Text>
-            {data?.gender && ["Nam", "Nữ"].includes(data.gender) && (
+            {data?.gender && ['Nam', 'Nữ'].includes(data.gender) && (
               <HStack space="xs" className="">
-                {data.gender === "Nam" ? (
+                {data.gender === 'Nam' ? (
                   <Text className="text-info-500">
                     <Ionicons size={20} name="male-outline" />
                   </Text>
@@ -97,11 +183,11 @@ const Room = () => {
           <Text className="text-green-600 font-medium">
             {data?.price.toLocaleString()} đ/tháng
           </Text>
-          <HStack space="md" className="flex">
+          <HStack space="md" className="items-center">
             <Text className="text-error-400">
               <Ionicons size={20} name="location" />
             </Text>
-            <Text className="w-11/12 line-clamp-1">{data?.address}</Text>
+            <Text className="w-11/12">{data?.address}</Text>
           </HStack>
           <HStack space="md" className="flex">
             <Text className="text-info-400">
@@ -151,14 +237,14 @@ const Room = () => {
               <Grid
                 className="gap-4"
                 _extra={{
-                  className: "grid-cols-9",
+                  className: 'grid-cols-9',
                 }}
               >
                 {stringToArray(data?.utilities).map((utility, i) => (
                   <GridItem
                     key={i}
                     _extra={{
-                      className: "col-span-3",
+                      className: 'col-span-3',
                     }}
                   >
                     <Box className="border rounded-lg p-3 border-info-600">
@@ -180,14 +266,14 @@ const Room = () => {
               <Grid
                 className="gap-4"
                 _extra={{
-                  className: "grid-cols-9",
+                  className: 'grid-cols-9',
                 }}
               >
                 {stringToArray(data?.interior).map((interior, i) => (
                   <GridItem
                     key={i}
                     _extra={{
-                      className: "col-span-3",
+                      className: 'col-span-3',
                     }}
                   >
                     <Box className="border rounded-lg p-3 border-info-600">
@@ -202,26 +288,23 @@ const Room = () => {
           )}
 
           <Divider />
-          <Pressable
-            onPress={() =>
-              router.push(`/(tabs)/(profile)/friend?id=${data?.postedBy.id}`)
-            }
-          >
+          <Pressable onPress={navigateToAccount}>
             {({ pressed }) => (
               <Box
                 className={`flex flex-row justify-between items-center ${
-                  pressed && "opacity-50"
+                  pressed && 'opacity-50'
                 }`}
               >
                 <HStack space="md" className="items-center">
                   <Image
                     size="sm"
                     source={{
-                      uri: "https://cdn.pixabay.com/photo/2018/08/28/12/41/avatar-3637425_1280.png",
+                      uri: 'https://cdn.pixabay.com/photo/2018/08/28/12/41/avatar-3637425_1280.png',
                     }}
                     alt="image"
                     className="rounded-full"
                   />
+
                   <VStack space="md">
                     <HStack space="sm" className="items-center">
                       <Text className="text-lg font-medium">
@@ -250,6 +333,33 @@ const Room = () => {
           )}
         </VStack>
       </ScrollView>
+      {data?.postedBy.id === user?.id && manage && manage != '' && (
+        <Box className="sticky bg-white p-4 rounded-t-lg shadow-lg">
+          <HStack space="md" className="justify-center">
+            <VStack className="w-1/2">
+              <Button
+                size="xl"
+                action="negative"
+                className="bg-error-400"
+                onPress={handleDeletePost}
+              >
+                <ButtonText>Xóa</ButtonText>
+                {isLoading && <ButtonSpinner />}
+              </Button>
+            </VStack>
+            <VStack className="w-1/2">
+              <Button
+                size="xl"
+                action="positive"
+                className="bg-success-300"
+                // onPress={() => actionPost(Mode.ACCEPT.key)}
+              >
+                <ButtonText>Chỉnh sửa</ButtonText>
+              </Button>
+            </VStack>
+          </HStack>
+        </Box>
+      )}
     </SafeAreaView>
   );
 };

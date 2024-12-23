@@ -91,6 +91,13 @@ const postApi = API.injectEndpoints({
       },
     }),
 
+    deletePost: build.mutation<void, number>({
+      query: id => ({
+        url: `${baseUrl}/${id}`, // Endpoint API cho việc xóa post
+        method: 'DELETE', // Sử dụng phương thức HTTP DELETE
+      }),
+    }),
+
     getPostsByUserId: build.query<
       PostModel[],
       {
@@ -113,9 +120,6 @@ const postApi = API.injectEndpoints({
         }
         return `/users/${id}${baseUrl}?${params.toString()}`;
       },
-      // providesTags: (result, error, { id }) => [
-      //   { type: 'PostsByUserId', id },
-      // ],
     }),
 
     createPost: build.mutation<PostModel, Partial<CreatePostModel>>({
@@ -124,9 +128,6 @@ const postApi = API.injectEndpoints({
         method: 'POST',
         body: newPost,
       }),
-      // invalidatesTags: (result, error, newPost) => [
-      //   { type: 'PostsByUserId', id: newPost. }, // Đánh dấu các cache liên quan cần làm mới
-      // ],
     }),
     getAllPosts: build.query<RoomDetailModel[], void>({
       query: () => {
@@ -143,10 +144,6 @@ const postApi = API.injectEndpoints({
             body: formData,
           };
         },
-        // Nếu muốn làm mới cache liên quan, có thể sử dụng invalidatesTags
-        // invalidatesTags: (result, error, { id }) => [
-        //   { type: 'PostsByCustomerId', id },
-        // ],
       },
     ),
   }),
@@ -159,4 +156,5 @@ export const {
   useGetPostsByUserIdQuery,
   useGetAllPostsQuery,
   useUploadImagesMutation,
+  useDeletePostMutation,
 } = postApi;

@@ -45,6 +45,8 @@ interface FilterType {
   utilities?: string;
   interior?: string;
   address?: string;
+  offset?: number;
+  limit?: number;
 }
 
 const Search = () => {
@@ -57,11 +59,18 @@ const Search = () => {
   const [utilities, setUtilities] = useState<string>('');
   const [interior, setInterior] = useState<string>('');
   const [address, setAddress] = useState<string>('');
+  // const [offset, setOffset] = useState<number>(0);
 
   const [params, setParams] = useState<FilterType>({
     postType: 'Phòng',
     sortBy: 'time',
   });
+
+  // const loadMore = () => {
+  //   if (!isFetching) {
+  //     setOffset(prev => prev + 5);
+  //   }
+  // };
 
   const debounceSearch = useDebounce(name, 1000);
 
@@ -238,7 +247,11 @@ const Search = () => {
         {isFetching ? (
           <RoomSkeleton />
         ) : (
-          <RoomList rooms={data ?? []} refetch={refetch} />
+          <RoomList
+            rooms={data ?? []}
+            refetch={refetch}
+            isFetching={isFetching}
+          />
         )}
       </Box>
 
