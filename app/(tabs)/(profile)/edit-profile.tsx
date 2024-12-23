@@ -21,7 +21,12 @@ import {
   PhoneIcon,
 } from "@/components/ui/icon";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { useSignupMutation, useVerifyJwtForUserQuery } from "@/services";
+import {
+  useGetUserQuery,
+  useSignupMutation,
+  useUpdateUserMutation,
+  useVerifyJwtForUserQuery,
+} from "@/services";
 import { Link, router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -52,10 +57,20 @@ import {
   useToast,
 } from "@/components/ui/toast";
 import { useDispatch } from "react-redux";
-import { authenticateUser, setUser } from "@/store/reducers";
+import { authenticateUser, selectUser, setUser } from "@/store/reducers";
 import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
 import { ScrollView } from "react-native";
-const SignUpSchema = Yup.object().shape({
+import { useSelector } from "react-redux";
+import {
+  Radio,
+  RadioGroup,
+  RadioIcon,
+  RadioIndicator,
+  RadioLabel,
+} from "@/components/ui/radio";
+import { VStack } from "@/components/ui/vstack";
+
+const InforSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, "Tên phải có ít nhất 2 ký tự")
     .required("Vui lòng nhập tên"),
@@ -63,98 +78,56 @@ const SignUpSchema = Yup.object().shape({
     .matches(/^[0-9]+$/, "Số điện thoại không hợp lệ")
     .min(10, "Số điện thoại phải có ít nhất 10 chữ số")
     .required("Vui lòng nhập số điện thoại"),
-  email: Yup.string()
-    .email("Email không hợp lệ")
-    .required("Vui lòng nhập email"),
   birthdate: Yup.date()
     .max(new Date(), "Ngày sinh không hợp lệ")
     .required("Vui lòng chọn ngày sinh"),
-  password: Yup.string()
-    .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
-    .required("Vui lòng nhập mật khẩu"),
+  gender: Yup.string().required("Vui lòng chọn giới tính"),
 });
+function extractDate(timestamp: any) {
+  return timestamp.split("T")[0] as any as Date;
+}
 
-const initialValues = {
-  name: "",
-  phone: "",
-  email: "",
-  birthdate: formatDate(new Date()),
-  password: "",
-  gender: "Nam",
-};
-
-const SignUp = () => {
+const EditProfile = () => {
   // dispatch
   const dispatch = useDispatch();
-
-  const [showPassword, setShowPassword] = React.useState(false);
-  const toast = useToast();
-  const [toastId, setToastId] = React.useState(0);
-
-  // Toast
-  const showNewToast = (type: string, error: string, message: string) => {
-    const newId = Math.random();
-    setToastId(newId);
-    toast.show({
-      id: newId + "",
-      placement: "top",
-      duration: 3000,
-      render: ({ id }) => {
-        const uniqueToastId = "toast-" + id;
-        return (
-          <Toast
-            nativeID={uniqueToastId}
-            action={`${type}` as any}
-            variant="outline"
-          >
-            <ToastTitle>{error}</ToastTitle>
-            <ToastDescription>{message}</ToastDescription>
-          </Toast>
-        );
-      },
-    });
-  };
-
+  const currentUser = useSelector(selectUser);
+  const [userForEdit] = useState({
+    name: currentUser?.name,
+    birthdate: currentUser?.birthdate,
+    gender: currentUser?.gender,
+    phone: currentUser?.phone,
+    ...currentUser,
+  });
   // Call api
-  // const [verify] = useVerifyJwtForUserMutation();
+  const [update, { isLoading }] = useUpdateUserMutation();
 
   // Date
 
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(
+    new Date(extractDate(currentUser?.birthdate))
+  );
   const [showPicker, setShowPicker] = useState(false);
-
   // Form
   const formik = useFormik({
-    initialValues: initialValues,
-    validationSchema: SignUpSchema,
+    initialValues: userForEdit,
+    validationSchema: InforSchema,
     onSubmit: async (values, { setSubmitting }) => {
       console.log("Form submitted with values:", values);
 
       try {
-        const response = await signup({
-          email: values.email,
-          gender: values.gender,
-          birthdate: values.birthdate as any as Date,
-          name: values.name,
-          password: values.password,
-          phone: values.phone,
+        const response = await update({
+          ...values,
         });
-        console.log(response);
+        // console.log(response);
         if (response.error) {
           const message =
             response.error.data.message ||
             response.error.message ||
             "Unknown error";
-          showNewToast("error", "Lỗi", message);
         } else {
-          if (response.data) {
-            const token = response.data.token;
-            await SecureStore.setItemAsync(LOCAL_STORAGE_JWT_KEY, token);
-
-            // return
-            dispatch(authenticateUser(true));
-          }
-          router.replace(`/(tabs)/(home)`);
+          //   Update user
+          dispatch(setUser(values as any));
+          router.replace(`/(tabs)/(profile)`);
         }
       } catch (error) {
         console.error(error);
@@ -165,9 +138,6 @@ const SignUp = () => {
     },
   });
 
-  // Call Api
-  const [signup, { isLoading }] = useSignupMutation();
-
   // Handle
 
   const toggleDatepicker = () => {
@@ -177,6 +147,7 @@ const SignUp = () => {
   const onChange = ({ type }: any, selectedDate: Date | undefined) => {
     if (type == "set" && selectedDate) {
       const currentDate = selectedDate;
+      console.log("currentDate", currentDate);
       setDate(currentDate);
       if (Platform.OS === "android") {
         toggleDatepicker();
@@ -185,12 +156,6 @@ const SignUp = () => {
     } else {
       toggleDatepicker();
     }
-  };
-
-  const handleState = () => {
-    setShowPassword((showState) => {
-      return !showState;
-    });
   };
 
   const confirmIOSDate = () => {
@@ -220,12 +185,8 @@ const SignUp = () => {
             </Box>
             {/* Title */}
             <Box className="p-5 flex flex-col flex-start w-full">
-              <Text size="5xl" className="text-black w-full font-extrabold">
-                Đăng ký
-              </Text>
-
-              <Text size="lg" className="text-gray-600 w-full font-normal">
-                Tạo tài khoản để đăng nhập
+              <Text size="4xl" className="text-black w-full font-extrabold">
+                Thay đổi thông tin
               </Text>
             </Box>
 
@@ -264,40 +225,6 @@ const SignUp = () => {
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
                     {formik.errors.name}
-                  </FormControlErrorText>
-                </FormControlError>
-              </FormControl>
-
-              {/* Email */}
-              <FormControl
-                isInvalid={formik.errors.email ? true : false}
-                size="md"
-                isDisabled={false}
-                isReadOnly={false}
-                isRequired={false}
-              >
-                <FormControlLabel>
-                  <FormControlLabelText size="lg" className="text-gray-600">
-                    Email
-                  </FormControlLabelText>
-                </FormControlLabel>
-                <Input size="lg" className="flex items-center h-12">
-                  <InputSlot className="pl-3 flex items-center">
-                    <InputIcon as={MailIcon} size={"lg"} />
-                  </InputSlot>
-                  <InputField
-                    className="leading-none px-4 py-2 h-full"
-                    type="text"
-                    placeholder={`Vui lòng nhập email`}
-                    value={formik.values.email}
-                    onChangeText={formik.handleChange("email")}
-                  />
-                </Input>
-
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>
-                    {formik.errors.email}
                   </FormControlErrorText>
                 </FormControlError>
               </FormControl>
@@ -379,7 +306,7 @@ const SignUp = () => {
                 <FormControlError>
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
-                    {formik.errors.birthdate}
+                    {/* {formik.errors.birthdate} */}
                   </FormControlErrorText>
                 </FormControlError>
               </FormControl>
@@ -420,9 +347,9 @@ const SignUp = () => {
                 </FormControlError>
               </FormControl>
 
-              {/* Password */}
+              {/* Gender */}
               <FormControl
-                isInvalid={formik.errors.password ? true : false}
+                isInvalid={formik.errors.gender ? true : false}
                 size="md"
                 isDisabled={false}
                 isReadOnly={false}
@@ -430,36 +357,37 @@ const SignUp = () => {
               >
                 <FormControlLabel>
                   <FormControlLabelText size="lg" className="text-gray-600">
-                    Mật khẩu
+                    Giới tính
                   </FormControlLabelText>
                 </FormControlLabel>
-                <Input size="lg" className="flex items-center h-12">
-                  <InputSlot className="pl-3 flex items-center">
-                    <InputIcon as={LockIcon} size={"lg"} />
-                  </InputSlot>
-                  <InputField
-                    className="leading-none px-4 py-2 h-full"
-                    type={showPassword ? "text" : "password"}
-                    placeholder={`Vui lòng nhập mật khẩu`}
-                    value={formik.values.password}
-                    onChangeText={formik.handleChange("password")}
-                  />
-                  <InputSlot
-                    className="pr-3 flex items-center"
-                    onPress={handleState}
-                  >
-                    <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
-                  </InputSlot>
-                </Input>
+                <RadioGroup
+                  className="my-2"
+                  value={formik.values.gender}
+                  onChange={formik.handleChange("gender")}
+                >
+                  <VStack space="sm">
+                    <Radio size="lg" value="Nam">
+                      <RadioIndicator>
+                        <RadioIcon as={CircleIcon} />
+                      </RadioIndicator>
+                      <RadioLabel>Nam</RadioLabel>
+                    </Radio>
+                    <Radio size="lg" value="Nữ">
+                      <RadioIndicator>
+                        <RadioIcon as={CircleIcon} />
+                      </RadioIndicator>
+                      <RadioLabel>Nữ</RadioLabel>
+                    </Radio>
+                  </VStack>
+                </RadioGroup>
 
                 <FormControlError>
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
-                    {formik.errors.password}
+                    {formik.errors.email}
                   </FormControlErrorText>
                 </FormControlError>
               </FormControl>
-
               {/* Button */}
               <Box className="flex flex-col justify-between">
                 {/* Login */}
@@ -473,27 +401,9 @@ const SignUp = () => {
                 >
                   {isLoading && <ActivityIndicator color="#D1D5DB" />}
                   {!isLoading && (
-                    <Text className="text-white font-bold text-lg">
-                      Đăng ký
-                    </Text>
+                    <Text className="text-white font-bold text-lg">Lưu</Text>
                   )}
                 </Pressable>
-
-                {/* You have account */}
-                <Box className="flex flex-row items-center gap-2 mt-4 w-full justify-center">
-                  <Text size="md" className="text-center">
-                    Bạn đã có tài khoản ?
-                  </Text>
-                  <Pressable
-                    onPress={() => {
-                      router.replace("/(auth)/log-in");
-                    }}
-                  >
-                    <Text size="lg" className="font-bold text-[#4D81E7]">
-                      Đăng nhập
-                    </Text>
-                  </Pressable>
-                </Box>
               </Box>
             </Box>
           </Box>
@@ -504,4 +414,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default EditProfile;

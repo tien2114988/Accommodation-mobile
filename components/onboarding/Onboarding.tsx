@@ -78,16 +78,6 @@ const Onboarding = ({ onboardings }: Props) => {
                 router.replace("/(tabs)/(home)");
               }}
             >
-              <Text className="text-black text-md p-5 font-normal text-xl hidden">
-                Bỏ qua
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className=""
-              onPress={() => {
-                router.replace("/(auth)/log-in");
-              }}
-            >
               <Text className="text-white items-center text-xl font-semibold h-auto py-3 px-11 bg-[#5517FF] rounded-full shadow-lg shadow-[#5517FF]">
                 Bắt đầu
               </Text>
