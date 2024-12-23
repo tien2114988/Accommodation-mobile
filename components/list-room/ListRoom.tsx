@@ -15,7 +15,6 @@ export default function ListRoom({ data }: Props) {
         data={data}
         renderItem={({ item }) => <Room room={item} />}
         keyExtractor={(item) => item.id.toString()}
-        scrollEnabled={false}
       />
     </Box>
   );
