@@ -34,7 +34,7 @@ const Home = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const [token, setToken] = useState<string | null>(null);
-  const [showModal, setShowModal] = React.useState(!isAuthenticated);
+  const [showModal, setShowModal] = React.useState(isAuthenticated);
   // Posts query
   const {
     data: posts,
@@ -265,10 +265,12 @@ const Home = () => {
 
         {/* List room */}
         <ListRoom data={posts!} />
-        <RequiredAuthenticationModal
-          showModal={showModal}
-          setShowModal={setShowModal}
-        />
+        {!isAuthenticated && (
+          <RequiredAuthenticationModal
+            showModal={showModal}
+            setShowModal={setShowModal}
+          />
+        )}
       </Box>
     </SafeAreaView>
   );
