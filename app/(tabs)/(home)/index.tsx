@@ -35,7 +35,15 @@ const Home = () => {
   const [token, setToken] = useState<string | null>(null);
 
   // Posts query
-  const { data: posts, error, isLoading } = useGetAllPostsQuery();
+  const {
+    data: posts,
+    error,
+    isLoading,
+  } = useGetPostsQuery({
+    limit: 2,
+    offset: 0,
+    postType: "Phòng",
+  });
 
   const { data: userData, isLoading: userLoading } = useVerifyJwtForUserQuery(
     token,
