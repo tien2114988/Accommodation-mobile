@@ -15,12 +15,6 @@ export default function ProfileLayout() {
         }}
       />
       <Stack.Screen
-        name="friend"
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
         name="edit-profile"
         options={{
           headerShown: false,

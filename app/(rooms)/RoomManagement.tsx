@@ -17,10 +17,14 @@ const RoomManagement = () => {
   const toast = useToast();
   const router = useRouter();
   const user = useSelector(selectUser);
-  const { type } = useLocalSearchParams();
+  const { type, friendId } = useLocalSearchParams();
+
+  const id = friendId ? +friendId : user?.id;
+
+  console.log(id);
 
   const { data, error, isFetching, refetch } = useGetPostsByUserIdQuery({
-    id: user?.id,
+    id: id,
     postType: type == 'room' ? 'Phòng' : 'Ở ghép',
   });
 

@@ -24,6 +24,8 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import EditProfileModal from '@/assets/profile/EditProfileModal';
 import { persistStore } from 'redux-persist';
 import { persistor, store } from '@/store';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { opacity } from 'react-native-reanimated/lib/typescript/Colors';
 
 function extractDate(timestamp: any) {
   return timestamp.split('T')[0];
@@ -119,7 +121,11 @@ const Profile = () => {
                 <Pressable
                   onPress={() => router.push('/(tabs)/(profile)/edit-profile')}
                 >
-                  <AntDesign name="edit" size={24} color="black" />
+                  {({ pressed }) => (
+                    <Box className={`${pressed && 'opacity-75'}`}>
+                      <Ionicons name="pencil-outline" size={24} color="black" />
+                    </Box>
+                  )}
                 </Pressable>
               </Box>
             </Box>
@@ -128,17 +134,26 @@ const Profile = () => {
               {/* Giới tính - Ngày sinh */}
               <HStack className="w-full flex items-center gap-2 justify-between border-b border-gray-300  py-3 px-5">
                 <Box className="flex flex-row items-center gap-4">
-                  <Fontisto name="intersex" size={32} color="black" />
+                  {currentUser?.gender === 'Nam' ? (
+                    <Ionicons name="male" size={32} color="#5AC1F2" />
+                  ) : (
+                    <Ionicons name="female" size={32} color="pink" />
+                  )}
                   <Box className="flex flex-col justify-center ">
-                    <Text className="text-base font-nomral">Giới tính:</Text>
-                    <Text className="text-lg"> {currentUser?.gender}</Text>
+                    <Text className="text-base">Giới tính:</Text>
+                    <Text className="text-lg font-medium">
+                      {' '}
+                      {currentUser?.gender}
+                    </Text>
                   </Box>
                 </Box>
                 <Box className="flex flex-row items-center gap-4">
-                  <AntDesign name="calendar" size={32} color="black" />
+                  <Text className="text-tertiary-400">
+                    <Ionicons name="calendar-number-outline" size={32} />
+                  </Text>
                   <Box className="flex flex-col justify-center">
-                    <Text className="text-base font-nomral">Ngày sinh</Text>
-                    <Text className="text-lg">
+                    <Text className="text-base">Ngày sinh:</Text>
+                    <Text className="text-lg font-medium">
                       {' '}
                       {currentUser?.birthdate.toString().substring(0, 10)}
                       {/* {extractDate(currentUser?.birthdate?.toString())} */}
@@ -149,12 +164,13 @@ const Profile = () => {
               {/* Email */}
               <HStack className="w-full flex items-center gap-2 justify-between  py-3 px-5 border-b border-gray-300">
                 <Box className="w-full flex flex-row items-center gap-4 ">
-                  <Fontisto name="email" size={32} color="black" />
+                  <Ionicons name="mail-outline" size={32} color="#df1f00" />
                   <Box className="flex flex-col justify-center">
-                    <Text className="text-gray-400 text-bawse font-nomral">
-                      Email
+                    <Text className="text-gray-400 text-base">Email:</Text>
+                    <Text className="text-lg font-medium">
+                      {' '}
+                      {currentUser?.email}
                     </Text>
-                    <Text className="text-lg"> {currentUser?.email}</Text>
                   </Box>
                 </Box>
               </HStack>
@@ -162,12 +178,15 @@ const Profile = () => {
               {/* Phone number */}
               <HStack className="w-full flex items-center gap-2 justify-between py-3 px-5">
                 <Box className="flex flex-row items-center gap-4">
-                  <AntDesign name="phone" size={32} color="black" />
+                  <Ionicons name="call-outline" size={32} color="#6cb454" />
                   <Box className="flex flex-col justify-center">
-                    <Text className="text-gray-400 text-bawse font-nomral">
-                      Số điện thoại
+                    <Text className="text-gray-400 text-base">
+                      Số điện thoại:
                     </Text>
-                    <Text className="text-lg"> {currentUser?.phone}</Text>
+                    <Text className="text-lg font-medium">
+                      {' '}
+                      {currentUser?.phone}
+                    </Text>
                   </Box>
                 </Box>
               </HStack>
@@ -175,43 +194,69 @@ const Profile = () => {
 
             {/* Button */}
             <VStack className="w-full border border-gray-300 rounded-2xl">
-              <Pressable onPress={() => router.push('/(rooms)/RoomManagement')}>
-                <Box
-                  className="w-full p-4 flex flex-row items-center gap-1 
-              justify-between border-b border-gray-300"
-                >
-                  <AntDesign name="home" size={32} color="black" />
-                  <Text className="text-black text-xl font-medium">
-                    Quản lý bài đăng cho thuê phòng
-                  </Text>
-                  <AntDesign name="arrowright" size={24} color="black" />
-                </Box>
+              <Pressable
+                onPress={() => router.push(`/(rooms)/RoomManagement?type=room`)}
+              >
+                {({ pressed }) => (
+                  <Box
+                    className={`w-full p-4 flex flex-row items-center gap-1 justify-between border-b border-gray-300 ${
+                      pressed && 'opacity-75'
+                    }`}
+                  >
+                    <HStack className="items-center" space="xl">
+                      <Image
+                        source={require('@/assets/images/btn1.png')}
+                        className="w-10 h-10"
+                        resizeMode="cover"
+                        alt="Quan ly bai dang cho thue phong"
+                      />
+                      <Text className="text-black text-lg font-medium">
+                        Đăng tin cho thuê
+                      </Text>
+                    </HStack>
+
+                    <AntDesign name="arrowright" size={24} color="black" />
+                  </Box>
+                )}
               </Pressable>
-              <Pressable onPress={() => router.push('/(rooms)/PairSearch')}>
-                <Box
-                  className="w-full p-4 flex flex-row items-center gap-1
-              justify-between "
-                >
-                  <FontAwesome6
-                    name="users-viewfinder"
-                    size={28}
-                    color="black"
-                  />
-                  <Text className="text-black text-xl font-medium">
-                    Quản lý bài đăng cho tìm ở ghép
-                  </Text>
-                  <AntDesign name="arrowright" size={24} color="black" />
-                </Box>
+              <Pressable
+                onPress={() => router.push('/(rooms)/RoomManagement?type=pair')}
+              >
+                {({ pressed }) => (
+                  <Box
+                    className={`w-full p-4 flex flex-row items-center gap-1 justify-between border-gray-300 ${
+                      pressed && 'opacity-75'
+                    }`}
+                  >
+                    <HStack className="items-center" space="xl">
+                      <Image
+                        source={require('@/assets/images/btn2.png')}
+                        className="w-10 h-10"
+                        resizeMode="cover"
+                        alt="Quan ly bai dang o ghep"
+                      />
+                      <Text className="text-black text-lg font-medium">
+                        Đăng tin ở ghép
+                      </Text>
+                    </HStack>
+
+                    <AntDesign name="arrowright" size={24} color="black" />
+                  </Box>
+                )}
               </Pressable>
             </VStack>
             <Pressable onPress={LogOut}>
-              <Box
-                className="w-full p-4 flex flex-row items-center gap-4 
-               border border-gray-300 rounded-2xl"
-              >
-                <AntDesign name="logout" size={24} color="black" />
-                <Text className="text-black text-xl font-bold">Đăng xuất</Text>
-              </Box>
+              {({ pressed }) => (
+                <Box
+                  className={`w-full p-4 flex flex-row items-center gap-4 
+                 border border-gray-300 rounded-2xl ${pressed && 'opacity-75'}`}
+                >
+                  <AntDesign name="logout" size={24} color="black" />
+                  <Text className="text-black text-xl font-bold">
+                    Đăng xuất
+                  </Text>
+                </Box>
+              )}
             </Pressable>
           </VStack>
           <EditProfileModal

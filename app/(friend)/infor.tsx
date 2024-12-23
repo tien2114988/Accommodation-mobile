@@ -1,20 +1,21 @@
-import { View, Text, SafeAreaView, Pressable } from "react-native";
-import React from "react";
-import { VStack } from "@/components/ui/vstack";
-import { Box } from "@/components/ui/box";
-import { HStack } from "@/components/ui/hstack";
-import { Image } from "@/components/ui/image";
-import Fontisto from "@expo/vector-icons/Fontisto";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import { router, useLocalSearchParams } from "expo-router";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { useGetUserQuery } from "@/services";
-import { Skeleton } from "@/components/ui/skeleton";
-import RoomSkeleton from "@/components/skeleton/RoomSkeleton";
+import { View, Text, SafeAreaView, Pressable } from 'react-native';
+import React from 'react';
+import { VStack } from '@/components/ui/vstack';
+import { Box } from '@/components/ui/box';
+import { HStack } from '@/components/ui/hstack';
+import { Image } from '@/components/ui/image';
+import Fontisto from '@expo/vector-icons/Fontisto';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { router, useLocalSearchParams } from 'expo-router';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { useGetUserQuery } from '@/services';
+import { Skeleton } from '@/components/ui/skeleton';
+import RoomSkeleton from '@/components/skeleton/RoomSkeleton';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const Friend = () => {
   const { id } = useLocalSearchParams();
-  const numericId = typeof id === "string" ? parseInt(id, 10) : null;
+  const numericId = typeof id === 'string' ? parseInt(id, 10) : null;
   const {
     data: currentUser,
     isLoading,
@@ -30,9 +31,9 @@ const Friend = () => {
     <SafeAreaView className="h-full p-4 w-full flex items-center bg-white">
       <VStack space="4xl" className="h-full flex p-4 w-full">
         {/* Title */}
-        <Box className="flex w-full">
+        {/* <Box className="flex w-full">
           <Text className="text-2xl font-bold">Thông tin tài khoản</Text>
-        </Box>
+        </Box> */}
         {/* Avatar */}
         <Box className="w-full flex flex-row items-center gap-2 border border-gray-300  py-2 px-4 rounded-2xl ">
           <Pressable>
@@ -67,18 +68,27 @@ const Friend = () => {
           {/* Giới tính - Ngày sinh */}
           <HStack className="w-full flex items-center gap-2 justify-between border-b border-gray-300  py-3 px-5">
             <Box className="flex flex-row items-center gap-4">
-              <Fontisto name="intersex" size={32} color="black" />
+              {/* <Fontisto name="intersex" size={32} color="black" /> */}
+              {currentUser?.gender === 'Nam' ? (
+                <Ionicons name="male" size={32} color="#5AC1F2" />
+              ) : (
+                <Ionicons name="female" size={32} color="pink" />
+              )}
+
               <Box className="flex flex-col justify-center ">
                 <Text className="text-base font-nomral">Giới tính:</Text>
                 <Text className="text-lg"> {currentUser?.gender}</Text>
               </Box>
             </Box>
             <Box className="flex flex-row items-center gap-4">
-              <AntDesign name="calendar" size={32} color="black" />
+              <Text className="text-tertiary-400">
+                <Ionicons name="calendar-number-outline" size={32} />
+              </Text>
+
               <Box className="flex flex-col justify-center">
-                <Text className="text-base font-nomral">Ngày sinh</Text>
+                <Text className="text-base">Ngày sinh</Text>
                 <Text className="text-lg">
-                  {" "}
+                  {' '}
                   {currentUser?.birthdate.toString().substring(0, 10)}
                   {/* {extractDate(currentUser?.birthdate?.toString())} */}
                 </Text>
@@ -88,7 +98,7 @@ const Friend = () => {
           {/* Email */}
           <HStack className="w-full flex items-center gap-2 justify-between  py-3 px-5 border-b border-gray-300">
             <Box className="w-full flex flex-row items-center gap-4 ">
-              <Fontisto name="email" size={32} color="black" />
+              <Ionicons name="mail-outline" size={32} color="#df1f00" />
               <Box className="flex flex-col justify-center">
                 <Text className="text-gray-400 text-bawse font-nomral">
                   Email
@@ -101,7 +111,7 @@ const Friend = () => {
           {/* Phone number */}
           <HStack className="w-full flex items-center gap-2 justify-between py-3 px-5">
             <Box className="flex flex-row items-center gap-4">
-              <AntDesign name="phone" size={32} color="black" />
+              <Ionicons name="call-outline" size={32} color="#6cb454" />
               <Box className="flex flex-col justify-center">
                 <Text className="text-gray-400 text-bawse font-nomral">
                   Số điện thoại
@@ -114,29 +124,55 @@ const Friend = () => {
 
         {/* Button */}
         <VStack className="w-full border border-gray-300 rounded-2xl">
-          <Pressable onPress={() => router.push("/(rooms)/RoomManagement")}>
-            <Box
-              className="w-full p-4 flex flex-row items-center gap-1 
-              justify-between border-b border-gray-300"
-            >
-              <AntDesign name="home" size={32} color="black" />
-              <Text className="text-black text-xl font-medium">
-                Bài đăng cho thuê phòng
-              </Text>
-              <AntDesign name="arrowright" size={24} color="black" />
-            </Box>
+          <Pressable
+            onPress={() =>
+              router.push(
+                `/(rooms)/RoomManagement?type=room&friendId=${numericId}`,
+              )
+            }
+          >
+            {({ pressed }) => (
+              <Box
+                className={`w-full p-4 flex flex-row items-center gap-1 justify-between border-b border-gray-300 ${
+                  pressed && 'opacity-75'
+                }`}
+              >
+                <Image
+                  source={require('@/assets/images/btn1.png')}
+                  className="w-10 h-10"
+                  resizeMode="cover"
+                />
+                <Text className="text-black text-xl font-medium">
+                  Bài đăng cho thuê phòng
+                </Text>
+                <AntDesign name="arrowright" size={24} color="black" />
+              </Box>
+            )}
           </Pressable>
-          <Pressable onPress={() => router.push("/(rooms)/PairSearch")}>
-            <Box
-              className="w-full p-4 flex flex-row items-center gap-1
-              justify-between "
-            >
-              <FontAwesome6 name="users-viewfinder" size={28} color="black" />
-              <Text className="text-black text-xl font-medium">
-                Bài đăng cho tìm ở ghép
-              </Text>
-              <AntDesign name="arrowright" size={24} color="black" />
-            </Box>
+          <Pressable
+            onPress={() =>
+              router.push(
+                `/(rooms)/RoomManagement?type=pair&friendId=${numericId}`,
+              )
+            }
+          >
+            {({ pressed }) => (
+              <Box
+                className={`w-full p-4 flex flex-row items-center gap-1 justify-between border-gray-300 ${
+                  pressed && 'opacity-75'
+                }`}
+              >
+                <Image
+                  source={require('@/assets/images/btn2.png')}
+                  className="w-10 h-10"
+                  resizeMode="cover"
+                />
+                <Text className="text-black text-xl font-medium">
+                  Bài đăng cho tìm ở ghép
+                </Text>
+                <AntDesign name="arrowright" size={24} color="black" />
+              </Box>
+            )}
           </Pressable>
         </VStack>
       </VStack>

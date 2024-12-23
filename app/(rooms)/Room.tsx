@@ -57,7 +57,7 @@ const Room = () => {
     if (data?.postedBy.id === user?.id) {
       router.push('/(tabs)/(profile)/profile');
     } else {
-      router.push(`/(tabs)/(profile)/friend?id=${data?.postedBy.id}`);
+      router.push(`/(friend)/infor?id=${data?.postedBy.id}`);
     }
   };
 
@@ -335,17 +335,18 @@ const Room = () => {
       </ScrollView>
       {data?.postedBy.id === user?.id && manage && manage != '' && (
         <Box className="sticky bg-white p-4 rounded-t-lg shadow-lg">
-          <HStack space="md" className="justify-center">
+          <Button
+            size="xl"
+            action="negative"
+            className="bg-error-400"
+            onPress={handleDeletePost}
+          >
+            <ButtonText>Xóa</ButtonText>
+            {isLoading && <ButtonSpinner />}
+          </Button>
+          {/* <HStack space="md" className="justify-center">
             <VStack className="w-1/2">
-              <Button
-                size="xl"
-                action="negative"
-                className="bg-error-400"
-                onPress={handleDeletePost}
-              >
-                <ButtonText>Xóa</ButtonText>
-                {isLoading && <ButtonSpinner />}
-              </Button>
+              
             </VStack>
             <VStack className="w-1/2">
               <Button
@@ -357,7 +358,7 @@ const Room = () => {
                 <ButtonText>Chỉnh sửa</ButtonText>
               </Button>
             </VStack>
-          </HStack>
+          </HStack> */}
         </Box>
       )}
     </SafeAreaView>

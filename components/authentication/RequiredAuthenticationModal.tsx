@@ -1,5 +1,5 @@
-import React from "react";
-import { Center } from "../ui/center";
+import React from 'react';
+import { Center } from '../ui/center';
 import {
   Modal,
   ModalBackdrop,
@@ -8,12 +8,12 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-} from "../ui/modal";
-import { Heading } from "../ui/heading";
-import { CloseIcon, Icon } from "../ui/icon";
-import { Text } from "../ui/text";
-import { Button, ButtonText } from "../ui/button";
-import { router } from "expo-router";
+} from '../ui/modal';
+import { Heading } from '../ui/heading';
+import { CloseIcon, Icon } from '../ui/icon';
+import { Text } from '../ui/text';
+import { Button, ButtonText } from '../ui/button';
+import { router } from 'expo-router';
 
 interface Props {
   showModal: boolean;
@@ -27,7 +27,7 @@ const RequiredAuthenticationModal = ({ showModal, setShowModal }: Props) => {
         isOpen={showModal}
         onClose={() => {
           setShowModal(false);
-          router.push("/(tabs)/(home)");
+          router.push('/(tabs)/(home)');
         }}
         size="md"
       >
@@ -37,7 +37,12 @@ const RequiredAuthenticationModal = ({ showModal, setShowModal }: Props) => {
             <Heading size="md" className="text-error-600">
               Lỗi
             </Heading>
-            <ModalCloseButton>
+            <ModalCloseButton
+              onPress={() => {
+                router.push('/(tabs)/(home)');
+                setShowModal(false);
+              }}
+            >
               <Icon
                 as={CloseIcon}
                 size="md"
@@ -55,7 +60,7 @@ const RequiredAuthenticationModal = ({ showModal, setShowModal }: Props) => {
               variant="outline"
               action="secondary"
               onPress={() => {
-                router.push("/(tabs)/(home)");
+                router.push('/(tabs)/(home)');
                 setShowModal(false);
               }}
             >
@@ -63,7 +68,7 @@ const RequiredAuthenticationModal = ({ showModal, setShowModal }: Props) => {
             </Button>
             <Button
               onPress={() => {
-                router.push("/(auth)/log-in");
+                router.push('/(auth)/log-in');
                 setShowModal(false);
               }}
             >
