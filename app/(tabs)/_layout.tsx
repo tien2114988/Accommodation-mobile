@@ -15,7 +15,7 @@ export default function Layout() {
     <Tabs
       initialRouteName="(home)"
       screenOptions={{
-        tabBarActiveTintColor: '#059669',
+        tabBarActiveTintColor: '#17a2b8',
         tabBarStyle: { paddingVertical: 10 },
       }}
     >
@@ -56,7 +56,7 @@ export default function Layout() {
           title: 'Tài khoản',
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="user" color={color} />
+            <Ionicons name="person-outline" size={24} color={color} />
           ),
         }}
       />
