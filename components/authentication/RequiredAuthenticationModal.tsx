@@ -26,8 +26,8 @@ const RequiredAuthenticationModal = ({ showModal, setShowModal }: Props) => {
       <Modal
         isOpen={showModal}
         onClose={() => {
-          router.push("/(tabs)/(home)");
           setShowModal(false);
+          router.push("/(tabs)/(home)");
         }}
         size="md"
       >

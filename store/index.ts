@@ -1,7 +1,7 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import authReducer from './reducers/auth';
-import postReducer from './reducers/post';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import authReducer from "./reducers/auth";
+import postReducer from "./reducers/post";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   persistReducer,
   persistStore,
@@ -11,10 +11,10 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-} from 'redux-persist';
-import { API } from '@/services';
-import authApi from '@/services/auth';
-
+} from "redux-persist";
+import { API } from "@/services";
+import authApi from "@/services/auth";
+import * as SecureStore from "expo-secure-store";
 const reducers = combineReducers({
   auth: authReducer,
   post: postReducer,
@@ -22,7 +22,7 @@ const reducers = combineReducers({
 });
 
 const persistConfig = {
-  key: 'root',
+  key: "root",
   storage: AsyncStorage,
   whitelist: [],
 };
@@ -31,10 +31,10 @@ const persistedReducer = persistReducer(persistConfig, reducers);
 
 const store = configureStore({
   reducer: persistedReducer,
-  devTools: process.env.NODE_ENV !== 'production',
-  middleware: getDefaultMiddleware =>
+  devTools: process.env.NODE_ENV !== "production",
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(
-      authApi.middleware,
+      authApi.middleware
     ),
 });
 

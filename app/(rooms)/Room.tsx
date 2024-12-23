@@ -1,31 +1,31 @@
-import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect } from 'react';
-import { Pressable, SafeAreaView, ScrollView } from 'react-native';
-import { Box } from '@/components/ui/box';
-import { useGetPostByIdQuery } from '@/services/post';
-import { Toast, ToastTitle, useToast } from '@/components/ui/toast';
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect } from "react";
+import { Pressable, SafeAreaView, ScrollView } from "react-native";
+import { Box } from "@/components/ui/box";
+import { useGetPostByIdQuery } from "@/services/post";
+import { Toast, ToastTitle, useToast } from "@/components/ui/toast";
 
-import { Image } from '@/components/ui/image';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { Divider } from '@/components/ui/divider';
-import { Grid, GridItem } from '@/components/ui/grid';
-import { stringToArray } from '@/utils/stringUtil';
-import RoomDetailSkeleton from '@/components/skeleton/RoomDetailSkeleton';
-import { useSelector } from 'react-redux';
-import { selectUser } from '@/store/reducers';
+import { Image } from "@/components/ui/image";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import { HStack } from "@/components/ui/hstack";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Divider } from "@/components/ui/divider";
+import { Grid, GridItem } from "@/components/ui/grid";
+import { stringToArray } from "@/utils/stringUtil";
+import RoomDetailSkeleton from "@/components/skeleton/RoomDetailSkeleton";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/store/reducers";
 
 const room = {
   thumbnail:
-    'https://www.xotels.com/wp-content/uploads/2022/07/Executive-Room-XOTELS.webp',
+    "https://www.xotels.com/wp-content/uploads/2022/07/Executive-Room-XOTELS.webp",
   title:
-    'Cần tìm nam ở ghép, trọn gói 1 triệu cả để xe, điện nước, gần trường đại học Nông Lâm',
-  type: 'Chung cư mini',
+    "Cần tìm nam ở ghép, trọn gói 1 triệu cả để xe, điện nước, gần trường đại học Nông Lâm",
+  type: "Chung cư mini",
   price: 1600000,
-  location: 'Phường 8, Quận 10, Thành phố Hồ Chí Minh',
-  phoneNumber: '0346066323',
+  location: "Phường 8, Quận 10, Thành phố Hồ Chí Minh",
+  phoneNumber: "0346066323",
 };
 
 const Room = () => {
@@ -37,10 +37,10 @@ const Room = () => {
   useEffect(() => {
     if (error) {
       toast.show({
-        placement: 'top',
+        placement: "top",
         duration: 3000,
         render: ({ id }) => {
-          const uniqueToastId = 'toast-' + id;
+          const uniqueToastId = "toast-" + id;
           return (
             <Toast nativeID={uniqueToastId} action="error" variant="outline">
               <ToastTitle>
@@ -67,18 +67,18 @@ const Room = () => {
             source={{
               uri:
                 data && data.pictures.length > 0
-                  ? 'https://accomodation-seeking-backend.onrender.com/pictures/' +
+                  ? "https://accomodation-seeking-backend.onrender.com/pictures/" +
                     data.pictures[0]
-                  : 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg',
+                  : "https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg",
             }}
             alt="image"
             className="rounded-lg w-full"
           />
           <Box className="flex flex-row justify-between items-center">
             <Text className="w-1/2 text-tertiary-500">• {data?.roomType}</Text>
-            {data?.gender && ['Nam', 'Nữ'].includes(data.gender) && (
+            {data?.gender && ["Nam", "Nữ"].includes(data.gender) && (
               <HStack space="xs" className="">
-                {data.gender === 'Nam' ? (
+                {data.gender === "Nam" ? (
                   <Text className="text-info-500">
                     <Ionicons size={20} name="male-outline" />
                   </Text>
@@ -151,14 +151,14 @@ const Room = () => {
               <Grid
                 className="gap-4"
                 _extra={{
-                  className: 'grid-cols-9',
+                  className: "grid-cols-9",
                 }}
               >
                 {stringToArray(data?.utilities).map((utility, i) => (
                   <GridItem
                     key={i}
                     _extra={{
-                      className: 'col-span-3',
+                      className: "col-span-3",
                     }}
                   >
                     <Box className="border rounded-lg p-3 border-info-600">
@@ -180,14 +180,14 @@ const Room = () => {
               <Grid
                 className="gap-4"
                 _extra={{
-                  className: 'grid-cols-9',
+                  className: "grid-cols-9",
                 }}
               >
                 {stringToArray(data?.interior).map((interior, i) => (
                   <GridItem
                     key={i}
                     _extra={{
-                      className: 'col-span-3',
+                      className: "col-span-3",
                     }}
                   >
                     <Box className="border rounded-lg p-3 border-info-600">
@@ -202,18 +202,22 @@ const Room = () => {
           )}
 
           <Divider />
-          <Pressable>
+          <Pressable
+            onPress={() =>
+              router.push(`/(tabs)/(profile)/friend?id=${data?.postedBy.id}`)
+            }
+          >
             {({ pressed }) => (
               <Box
                 className={`flex flex-row justify-between items-center ${
-                  pressed && 'opacity-50'
+                  pressed && "opacity-50"
                 }`}
               >
                 <HStack space="md" className="items-center">
                   <Image
                     size="sm"
                     source={{
-                      uri: 'https://cdn.pixabay.com/photo/2018/08/28/12/41/avatar-3637425_1280.png',
+                      uri: "https://cdn.pixabay.com/photo/2018/08/28/12/41/avatar-3637425_1280.png",
                     }}
                     alt="image"
                     className="rounded-full"

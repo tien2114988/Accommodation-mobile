@@ -20,6 +20,8 @@ export default function Room({ room }: Props) {
   const navigateToRoom = (id: number) => {
     router.push(`/(rooms)/Room?id=${id}`);
   };
+  // console.log(room);
+
   return (
     <Box className="">
       <Pressable onPress={() => navigateToRoom(room.id)}>
@@ -32,7 +34,11 @@ export default function Room({ room }: Props) {
               <Image
                 size="xl"
                 source={{
-                  uri: "https://sbshouse.vn/wp-content/uploads/2022/10/Noi-that-nha-3-tang-hien-dai-20.jpg",
+                  uri:
+                    room && room.pictures.length > 0
+                      ? "https://accomodation-seeking-backend.onrender.com/pictures/" +
+                        room.pictures[0]
+                      : "https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg",
                 }}
                 alt="image"
                 className="rounded-lg"

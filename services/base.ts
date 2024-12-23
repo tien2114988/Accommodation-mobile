@@ -12,13 +12,18 @@ import * as SecureStore from "expo-secure-store";
 const baseQuery = fetchBaseQuery({
   baseUrl: Config.API_URL,
   prepareHeaders: async (headers, api) => {
-    const token = await SecureStore.getItemAsync(LOCAL_STORAGE_JWT_KEY);
-    // console.log("token in base APi", token);
+    try {
+      // Fetch the token from SecureStore
+      const token = await SecureStore.getItemAsync(LOCAL_STORAGE_JWT_KEY);
+      // console.log("token in base API:", token);
 
-    if (token) {
-      headers.set("authorization", `Bearer ${token}`);
+      // If the token exists, set the Authorization header
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+    } catch (error) {
+      console.error("Error fetching token:", error);
     }
-    return headers;
   },
 });
 

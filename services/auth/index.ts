@@ -49,10 +49,13 @@ const authApi = API.injectEndpoints({
         body: credentials,
       }),
     }),
-    verifyJwtForUser: build.query<User, void>({
-      query: () => ({
+    verifyJwtForUser: build.query<User, any>({
+      query: (token) => ({
         url: `/users/`,
         method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }),
     }),
   }),

@@ -52,7 +52,6 @@ import { err } from "react-native-svg/lib/typescript/xml";
 const LogIn = () => {
   // dispatch
   const dispatch = useDispatch();
-  const { data: user, error, isLoading } = useVerifyJwtForUserQuery();
   // Set Valid
   const [isInvalidEmail, setIsInvalidEmail] = useState(false);
   const [isInvalidPassword, setIsInvalidPassword] = useState(false);
@@ -126,7 +125,7 @@ const LogIn = () => {
       }
 
       const response = await login({ email, password });
-      console.log(response);
+      // console.log(response);
 
       if (response.error) {
         const message =
@@ -146,7 +145,7 @@ const LogIn = () => {
           dispatch(authenticateUser(true));
         }
 
-        router.replace(`/(tabs)/(home)`);
+        router.replace(`/`);
       }
     } catch (error) {
       router.replace(`/+not-found`);
