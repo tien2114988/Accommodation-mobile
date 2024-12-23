@@ -120,21 +120,17 @@ const SignUp = () => {
 
   // Date
 
-  const [date, setDate] = useState(new Date());
-  const [showPicker, setShowPicker] = useState(false);
-
   // Form
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: SignUpSchema,
     onSubmit: async (values, { setSubmitting }) => {
       console.log("Form submitted with values:", values);
-
       try {
         const response = await signup({
           email: values.email,
           gender: values.gender,
-          birthdate: values.birthdate as any as Date,
+          birthdate: new Date(),
           name: values.name,
           password: values.password,
           phone: values.phone,
@@ -170,32 +166,10 @@ const SignUp = () => {
 
   // Handle
 
-  const toggleDatepicker = () => {
-    setShowPicker(!showPicker);
-  };
-
-  const onChange = ({ type }: any, selectedDate: Date | undefined) => {
-    if (type == "set" && selectedDate) {
-      const currentDate = selectedDate;
-      setDate(currentDate);
-      if (Platform.OS === "android") {
-        toggleDatepicker();
-      }
-      formik.setFieldValue("birthdate", formatDate(currentDate));
-    } else {
-      toggleDatepicker();
-    }
-  };
-
   const handleState = () => {
     setShowPassword((showState) => {
       return !showState;
     });
-  };
-
-  const confirmIOSDate = () => {
-    formik.setFieldValue("birthdate", formatDate(date));
-    toggleDatepicker();
   };
 
   return (
@@ -298,88 +272,6 @@ const SignUp = () => {
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
                     {formik.errors.email}
-                  </FormControlErrorText>
-                </FormControlError>
-              </FormControl>
-
-              {/* Birthdate */}
-              <FormControl
-                isInvalid={formik.errors.birthdate ? true : false}
-                size="md"
-                isDisabled={false}
-                isReadOnly={false}
-                isRequired={false}
-              >
-                <FormControlLabel>
-                  <FormControlLabelText size="lg" className="text-gray-600">
-                    Ngày sinh
-                  </FormControlLabelText>
-                </FormControlLabel>
-                <View className="w-full">
-                  {!showPicker && (
-                    <Pressable onPress={() => toggleDatepicker()}>
-                      <Input
-                        size="lg"
-                        className="flex items-center h-12 justify-center"
-                      >
-                        <InputSlot className="pl-3 flex items-center">
-                          <InputIcon as={CalendarDaysIcon} size={"md"} />
-                        </InputSlot>
-
-                        <InputField
-                          className="leading-none px-4 py-2 h-full"
-                          type="text"
-                          placeholder={`Vui lòng chọn ngày sinh`}
-                          value={date ? formatDate(date) : ""}
-                          // onChangeText={formik.handleChange("birthdate")}
-                          onPressIn={toggleDatepicker}
-                          editable={false}
-                        />
-                      </Input>
-                    </Pressable>
-                  )}
-                  {showPicker && (
-                    <DateTimePicker
-                      style={[
-                        {
-                          height: 120,
-                          marginTop: -10,
-                        },
-                      ]}
-                      mode="date"
-                      display="spinner"
-                      value={date}
-                      onChange={onChange}
-                    />
-                  )}
-                  {showPicker && Platform.OS === "ios" && (
-                    <View className="flex flex-row justify-center items-center w-full gap-3">
-                      <TouchableOpacity
-                        className="w-1/2 h-12 bg-error-400 rounded-lg flex justify-center items-center mt-2"
-                        onPress={toggleDatepicker}
-                      >
-                        <Text className="text-white font-bold text-lg">
-                          Hủy bỏ
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        className="w-1/2 h-12 bg-success-400 rounded-lg flex justify-center items-center mt-2"
-                        onPress={confirmIOSDate}
-                      >
-                        <Text className="text-white font-bold text-lg">
-                          Xác nhận
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                </View>
-                <FormControlHelper>
-                  {/* <FormControlHelperText>YY-MM-DD</FormControlHelperText> */}
-                </FormControlHelper>
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>
-                    {formik.errors.birthdate}
                   </FormControlErrorText>
                 </FormControlError>
               </FormControl>
