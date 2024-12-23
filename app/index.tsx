@@ -14,7 +14,6 @@ import Loading from "@/components/loading/Loading";
 import { useVerifyJwtForUserQuery } from "@/services";
 
 const App = () => {
-  const [firstTime, setFristTIme] = useState<boolean | null>(null);
   // const isAuthenticated = false;
   const dispatch = useDispatch();
   const [token, setToken] = useState<string | null>(null);
@@ -28,7 +27,8 @@ const App = () => {
 
   useEffect(() => {
     getFirstTime();
-  }, []);
+    getToken();
+  }, [token]);
 
   const getFirstTime = async () => {
     setIsLoading(true);
@@ -48,7 +48,24 @@ const App = () => {
       setIsLoading(false);
     }
   };
+  const getToken = async () => {
+    setIsLoading(true);
+    try {
+      const jwt = await SecureStore.getItemAsync(LOCAL_STORAGE_JWT_KEY);
 
+      if (!jwt) {
+        return;
+      }
+      setToken(jwt);
+      dispatch(authenticateUser(true));
+
+      
+    } catch (error) {
+      console.error("Error retrieving token:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   if (userLoading || isLoading) {
     return <Loading />;
   }
