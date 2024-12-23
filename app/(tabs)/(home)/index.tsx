@@ -244,10 +244,12 @@ const Home = () => {
 
         {/* List room */}
         <ListRoom data={posts!} />
-        <RequiredAuthenticationModal
-          showModal={showModal}
-          setShowModal={setShowModal}
-        />
+        {!isAuthenticated && (
+          <RequiredAuthenticationModal
+            showModal={showModal}
+            setShowModal={setShowModal}
+          />
+        )}
       </Box>
     </SafeAreaView>
   );
