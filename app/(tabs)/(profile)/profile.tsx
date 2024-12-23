@@ -1,34 +1,35 @@
-import { View, Text, SafeAreaView, Alert } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { Button, ButtonText } from '@/components/ui/button';
+import { View, Text, SafeAreaView, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Button, ButtonText } from "@/components/ui/button";
 import {
   clearAuthState,
   selectIsAuthenticated,
   selectUser,
+  setIsAuthenticated,
   setUser,
-} from '@/store/reducers';
-import { useDispatch } from 'react-redux';
-import * as SecureStore from 'expo-secure-store';
-import { LOCAL_STORAGE_JWT_KEY } from '@/constants';
-import { useSelector } from 'react-redux';
-import RequiredAuthenticationModal from '@/components/authentication/RequiredAuthenticationModal';
-import { router, useFocusEffect } from 'expo-router';
-import { Box } from '@/components/ui/box';
-import { Image } from '@/components/ui/image';
-import { HStack } from '@/components/ui/hstack';
-import { VStack } from '@/components/ui/vstack';
-import Fontisto from '@expo/vector-icons/Fontisto';
-import { Pressable } from '@/components/ui/pressable';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import EditProfileModal from '@/assets/profile/EditProfileModal';
-import { persistStore } from 'redux-persist';
-import { persistor, store } from '@/store';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { opacity } from 'react-native-reanimated/lib/typescript/Colors';
+} from "@/store/reducers";
+import { useDispatch } from "react-redux";
+import * as SecureStore from "expo-secure-store";
+import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
+import { useSelector } from "react-redux";
+import RequiredAuthenticationModal from "@/components/authentication/RequiredAuthenticationModal";
+import { router, useFocusEffect } from "expo-router";
+import { Box } from "@/components/ui/box";
+import { Image } from "@/components/ui/image";
+import { HStack } from "@/components/ui/hstack";
+import { VStack } from "@/components/ui/vstack";
+import Fontisto from "@expo/vector-icons/Fontisto";
+import { Pressable } from "@/components/ui/pressable";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import EditProfileModal from "@/assets/profile/EditProfileModal";
+import { persistStore } from "redux-persist";
+import { persistor, store } from "@/store";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { opacity } from "react-native-reanimated/lib/typescript/Colors";
 
 function extractDate(timestamp: any) {
-  return timestamp.split('T')[0];
+  return timestamp.split("T")[0];
 }
 
 const Profile = () => {
@@ -43,10 +44,11 @@ const Profile = () => {
     persistor.purge();
 
     dispatch(setUser(null));
-    await SecureStore.deleteItemAsync('jwt');
+    dispatch(setIsAuthenticated(false));
+    await SecureStore.deleteItemAsync("jwt");
     // console.log("JWT successfully deleted.");
     setShowModal(false);
-    router.replace('/(tabs)/(home)');
+    router.replace("/(tabs)/(home)");
   };
 
   useEffect(() => {
@@ -61,7 +63,7 @@ const Profile = () => {
       } else {
         setShowModal(true); // Show the modal if not authenticated
       }
-    }, [isAuthenticated]),
+    }, [isAuthenticated])
   );
 
   return (
@@ -119,10 +121,10 @@ const Profile = () => {
                   {currentUser?.name}
                 </Text>
                 <Pressable
-                  onPress={() => router.push('/(tabs)/(profile)/edit-profile')}
+                  onPress={() => router.push("/(tabs)/(profile)/edit-profile")}
                 >
                   {({ pressed }) => (
-                    <Box className={`${pressed && 'opacity-75'}`}>
+                    <Box className={`${pressed && "opacity-75"}`}>
                       <Ionicons name="pencil-outline" size={24} color="black" />
                     </Box>
                   )}
@@ -134,7 +136,7 @@ const Profile = () => {
               {/* Giới tính - Ngày sinh */}
               <HStack className="w-full flex items-center gap-2 justify-between border-b border-gray-300  py-3 px-5">
                 <Box className="flex flex-row items-center gap-4">
-                  {currentUser?.gender === 'Nam' ? (
+                  {currentUser?.gender === "Nam" ? (
                     <Ionicons name="male" size={32} color="#5AC1F2" />
                   ) : (
                     <Ionicons name="female" size={32} color="pink" />
@@ -142,7 +144,7 @@ const Profile = () => {
                   <Box className="flex flex-col justify-center ">
                     <Text className="text-base">Giới tính:</Text>
                     <Text className="text-lg font-medium">
-                      {' '}
+                      {" "}
                       {currentUser?.gender}
                     </Text>
                   </Box>
@@ -154,7 +156,7 @@ const Profile = () => {
                   <Box className="flex flex-col justify-center">
                     <Text className="text-base">Ngày sinh:</Text>
                     <Text className="text-lg font-medium">
-                      {' '}
+                      {" "}
                       {currentUser?.birthdate.toString().substring(0, 10)}
                       {/* {extractDate(currentUser?.birthdate?.toString())} */}
                     </Text>
@@ -168,7 +170,7 @@ const Profile = () => {
                   <Box className="flex flex-col justify-center">
                     <Text className="text-gray-400 text-base">Email:</Text>
                     <Text className="text-lg font-medium">
-                      {' '}
+                      {" "}
                       {currentUser?.email}
                     </Text>
                   </Box>
@@ -184,7 +186,7 @@ const Profile = () => {
                       Số điện thoại:
                     </Text>
                     <Text className="text-lg font-medium">
-                      {' '}
+                      {" "}
                       {currentUser?.phone}
                     </Text>
                   </Box>
@@ -200,12 +202,12 @@ const Profile = () => {
                 {({ pressed }) => (
                   <Box
                     className={`w-full p-4 flex flex-row items-center gap-1 justify-between border-b border-gray-300 ${
-                      pressed && 'opacity-75'
+                      pressed && "opacity-75"
                     }`}
                   >
                     <HStack className="items-center" space="xl">
                       <Image
-                        source={require('@/assets/images/btn1.png')}
+                        source={require("@/assets/images/btn1.png")}
                         className="w-10 h-10"
                         resizeMode="cover"
                         alt="Quan ly bai dang cho thue phong"
@@ -220,17 +222,17 @@ const Profile = () => {
                 )}
               </Pressable>
               <Pressable
-                onPress={() => router.push('/(rooms)/RoomManagement?type=pair')}
+                onPress={() => router.push("/(rooms)/RoomManagement?type=pair")}
               >
                 {({ pressed }) => (
                   <Box
                     className={`w-full p-4 flex flex-row items-center gap-1 justify-between border-gray-300 ${
-                      pressed && 'opacity-75'
+                      pressed && "opacity-75"
                     }`}
                   >
                     <HStack className="items-center" space="xl">
                       <Image
-                        source={require('@/assets/images/btn2.png')}
+                        source={require("@/assets/images/btn2.png")}
                         className="w-10 h-10"
                         resizeMode="cover"
                         alt="Quan ly bai dang o ghep"
@@ -249,7 +251,7 @@ const Profile = () => {
               {({ pressed }) => (
                 <Box
                   className={`w-full p-4 flex flex-row items-center gap-4 
-                 border border-gray-300 rounded-2xl ${pressed && 'opacity-75'}`}
+                 border border-gray-300 rounded-2xl ${pressed && "opacity-75"}`}
                 >
                   <AntDesign name="logout" size={24} color="black" />
                   <Text className="text-black text-xl font-bold">

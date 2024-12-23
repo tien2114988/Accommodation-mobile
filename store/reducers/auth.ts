@@ -18,6 +18,9 @@ const slice = createSlice({
     setUser(state, action: PayloadAction<User | null>) {
       state.user = action.payload;
     },
+    setIsAuthenticated(state, action: PayloadAction<boolean>) {
+      state.isAuthenticated = action.payload;
+    },
     clearAuthState(state) {
       state.user = null;
       state.isAuthenticated = false;
@@ -28,7 +31,8 @@ const slice = createSlice({
   },
 });
 
-export const { setUser, clearAuthState, authenticateUser } = slice.actions;
+export const { setUser, clearAuthState, authenticateUser, setIsAuthenticated } =
+  slice.actions;
 
 export const selectIsAuthenticated = (state: { auth: AuthState }) =>
   state.auth.isAuthenticated;

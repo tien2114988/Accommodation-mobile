@@ -32,7 +32,7 @@ const usersApi = API.injectEndpoints({
         body: data,
       }),
     }),
-    uploadAvatar: build.mutation<string, any>({
+    uploadAvatar: build.mutation<string, { id: number; file: FormData }>({
       query: (data) => ({
         url: `users/${data.id}/picture`,
         method: "POST",

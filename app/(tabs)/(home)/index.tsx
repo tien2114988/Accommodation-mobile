@@ -1,30 +1,30 @@
-import { Button, ButtonText } from '@/components/ui/button';
-import { LOCAL_STORAGE_JWT_KEY } from '@/constants';
-import { selectIsAuthenticated, selectUser, setUser } from '@/store/reducers';
-import { WorkType } from '@/constants';
-import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { Button, ButtonText } from "@/components/ui/button";
+import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
+import { selectIsAuthenticated, selectUser, setUser } from "@/store/reducers";
+import { WorkType } from "@/constants";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   View,
   SafeAreaView,
   Image,
   TouchableWithoutFeedback,
-} from 'react-native';
-import { useSelector } from 'react-redux';
-import * as SecureStore from 'expo-secure-store';
-import { Box } from '@/components/ui/box';
-import { VStack } from '@/components/ui/vstack';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { Text } from '@/components/ui/text';
-import { Pressable } from '@/components/ui/pressable';
-import { HStack } from '@/components/ui/hstack';
-import Carousel from '@/components/carousel/Carousel';
-import ListRoom from '@/components/list-room/ListRoom';
-import { useGetAllPostsQuery, useGetPostsQuery } from '@/services/post';
-import Loading from '@/components/loading/Loading';
-import { useDispatch } from 'react-redux';
-import { User, useVerifyJwtForUserQuery } from '@/services';
-import RequiredAuthenticationModal from '@/components/authentication/RequiredAuthenticationModal';
+} from "react-native";
+import { useSelector } from "react-redux";
+import * as SecureStore from "expo-secure-store";
+import { Box } from "@/components/ui/box";
+import { VStack } from "@/components/ui/vstack";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Text } from "@/components/ui/text";
+import { Pressable } from "@/components/ui/pressable";
+import { HStack } from "@/components/ui/hstack";
+import Carousel from "@/components/carousel/Carousel";
+import ListRoom from "@/components/list-room/ListRoom";
+import { useGetAllPostsQuery, useGetPostsQuery } from "@/services/post";
+import Loading from "@/components/loading/Loading";
+import { useDispatch } from "react-redux";
+import { User, useVerifyJwtForUserQuery } from "@/services";
+import RequiredAuthenticationModal from "@/components/authentication/RequiredAuthenticationModal";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -32,9 +32,8 @@ const Home = () => {
   // Redux state
   const currentUser = useSelector(selectUser);
   const isAuthenticated = useSelector(selectIsAuthenticated);
-
   const [token, setToken] = useState<string | null>(null);
-  const [showModal, setShowModal] = React.useState(isAuthenticated);
+  const [showModal, setShowModal] = React.useState(false);
   // Posts query
   const {
     data: posts,
@@ -43,14 +42,14 @@ const Home = () => {
   } = useGetPostsQuery({
     limit: 2,
     offset: 0,
-    postType: 'Phòng',
+    postType: "Phòng",
   });
 
   const { data: userData, isLoading: userLoading } = useVerifyJwtForUserQuery(
     token,
     {
       skip: !token,
-    },
+    }
   );
   useEffect(() => {
     const fetchToken = async () => {
@@ -87,7 +86,7 @@ const Home = () => {
           Hôm nay của bạn thế nào
         </Text>
         <Image
-          source={require('@/assets/images/home.png')}
+          source={require("@/assets/images/home.png")}
           className="w-full h-80"
           resizeMode="cover"
         />
@@ -110,13 +109,13 @@ const Home = () => {
               <HStack
                 className={`border-2 bg-gray-200 border-green-500 py-2 px-2 w-2/3
                 gap-1 flex flex-row justify-around items-center rounded-lg ${
-                  pressed ? 'bg-green-500 shadow-md ' : 'bg-white'
+                  pressed ? "bg-green-500 shadow-md " : "bg-white"
                 }`}
               >
                 <Text
                   size="md"
                   className={`font-bold text-green-400 max-w-24 text-center
-                   ${pressed ? 'text-white' : ''}
+                   ${pressed ? "text-white" : ""}
                   `}
                 >
                   Đăng nhập
@@ -124,7 +123,7 @@ const Home = () => {
                 <Text
                   size="md"
                   className={`font-bold text-green-400 max-w-24 text-center
-                  ${pressed ? 'text-white' : ''}
+                  ${pressed ? "text-white" : ""}
                  `}
                 >
                   /
@@ -132,7 +131,7 @@ const Home = () => {
                 <Text
                   size="md"
                   className={`font-bold text-green-400  max-w-30 text-center
-                  ${pressed ? 'text-white' : ''}
+                  ${pressed ? "text-white" : ""}
                  `}
                 >
                   Tạo tài khoản
@@ -151,9 +150,9 @@ const Home = () => {
             }}
           >
             {({ pressed }) => (
-              <Box className={`flex items-center ${pressed && 'opacity-75'}`}>
+              <Box className={`flex items-center ${pressed && "opacity-75"}`}>
                 <Image
-                  source={require('@/assets/images/btn1.png')}
+                  source={require("@/assets/images/btn1.png")}
                   className="w-10 h-10"
                   resizeMode="cover"
                 />
@@ -170,9 +169,9 @@ const Home = () => {
             }}
           >
             {({ pressed }) => (
-              <Box className={`flex items-center ${pressed && 'opacity-75'}`}>
+              <Box className={`flex items-center ${pressed && "opacity-75"}`}>
                 <Image
-                  source={require('@/assets/images/btn2.png')}
+                  source={require("@/assets/images/btn2.png")}
                   className="w-10 h-10"
                   resizeMode="cover"
                 />
@@ -193,9 +192,9 @@ const Home = () => {
             }}
           >
             {({ pressed }) => (
-              <Box className={`flex items-center ${pressed && 'opacity-75'}`}>
+              <Box className={`flex items-center ${pressed && "opacity-75"}`}>
                 <Image
-                  source={require('@/assets/images/btn3.png')}
+                  source={require("@/assets/images/btn3.png")}
                   className="w-10 h-10"
                   resizeMode="cover"
                 />
@@ -216,9 +215,9 @@ const Home = () => {
             }}
           >
             {({ pressed }) => (
-              <Box className={`flex items-center ${pressed && 'opacity-75'}`}>
+              <Box className={`flex items-center ${pressed && "opacity-75"}`}>
                 <Image
-                  source={require('@/assets/images/btn4.png')}
+                  source={require("@/assets/images/btn4.png")}
                   className="w-10 h-10"
                   resizeMode="cover"
                 />
@@ -234,7 +233,7 @@ const Home = () => {
       {/* List Rooms */}
       <Box
         className={`w-full h-full flex-1 px-2  ${
-          isAuthenticated ? 'mt-28' : 'mt-40'
+          isAuthenticated ? "mt-28" : "mt-40"
         }`}
       >
         {/* Title */}
@@ -255,7 +254,7 @@ const Home = () => {
             {({ pressed }) => (
               <Text
                 size="md"
-                className={`text-info-700 font-bold ${pressed && 'opacity-75'}`}
+                className={`text-info-700 font-bold ${pressed && "opacity-75"}`}
               >
                 Xem thêm
               </Text>
