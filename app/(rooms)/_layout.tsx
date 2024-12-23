@@ -20,15 +20,7 @@ export default function RoomsLayout() {
         name="RoomManagement"
         options={{
           headerShown: true,
-          title: 'Cho thuê phòng',
-          headerShadowVisible: false,
-        }}
-      />
-      <Stack.Screen
-        name="PairManagement"
-        options={{
-          headerShown: true,
-          title: 'Tìm ở ghép',
+          title: 'Quản lý bài đăng',
           headerShadowVisible: false,
         }}
       />

@@ -1,74 +1,73 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView } from 'react-native';
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  TouchableOpacity,
+  Alert,
+  Platform,
+} from 'react-native';
 import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
-import { Card } from '@/components/ui/card';
-import { Text } from '@/components/ui/text';
-import { Heading } from '@/components/ui/heading';
-import { CreatePostModel, HouseCleaningOption } from '@/types/postTypes';
 import { Box } from '@/components/ui/box';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import ScrollPickerModal from '@/components/post/ScrollPickerModal';
 import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button';
 import {
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
-} from '@/components/ui/radio';
-import { CircleIcon } from '@/components/ui/icon';
+  clearPostForm,
+  selectPostForm,
+  selectUser,
+  setPostForm,
+} from '@/store/reducers';
+import { Heading } from '@/components/ui/heading';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import { Card } from '@/components/ui/card';
 import { Textarea, TextareaInput } from '@/components/ui/textarea';
-import { useDispatch, useSelector } from 'react-redux';
-import { clearPostForm, selectPostForm } from '@/store/reducers';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useCreatePostMutation } from '@/services/post';
+import { Pressable } from '@/components/ui/pressable';
+import { Text } from '@/components/ui/text';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { Image } from '@/components/ui/image';
+import { HStack } from '@/components/ui/hstack';
+import { Center } from '@/components/ui/center';
 import {
-  useToast,
+  useCreatePostMutation,
+  useGetPostsByUserIdQuery,
+  useUploadImagesMutation,
+} from '@/services/post';
+import {
   Toast,
-  ToastTitle,
   ToastDescription,
+  ToastTitle,
+  useToast,
 } from '@/components/ui/toast';
-import PostInfo from '@/components/post/PostInfo';
-import PostAddress from '@/components/post/PostAddress';
-import { LinearGradient } from 'expo-linear-gradient';
-
-const options: HouseCleaningOption[] = [
-  { area: 60, totalFreelancers: 2, duration: 3 },
-  { area: 80, totalFreelancers: 2, duration: 4 },
-  { area: 100, totalFreelancers: 3, duration: 3 },
-  { area: 150, totalFreelancers: 3, duration: 4 },
-  { area: 200, totalFreelancers: 4, duration: 6 },
-  { area: 400, totalFreelancers: 4, duration: 8 },
-];
-
-const addressId = '9b18beec-a0da-4b40-a377-b8adc0612b2a';
+import { CreatePostModel } from '@/types/postTypes';
 
 const Checkout = () => {
   const dispatch = useDispatch();
-  const [createPost, { isLoading, error, data }] = useCreatePostMutation();
-  const { workType } = useLocalSearchParams();
-  const [showPickerModal, setShowPickerModal] = useState<boolean>(false);
-
-  const [selectedHour, setSelectedHour] = useState<number>(0);
-  const [selectedMinute, setSelectedMinute] = useState<number>(0);
-  const [paymentType, setPaymentType] = useState<string>('QR');
-  const [customerNote, setCustomerNote] = useState<string>('');
-
-  const toast = useToast();
-
+  const router = useRouter();
   const postForm = useSelector(selectPostForm);
+  const [createPost, { isLoading, error, data }] = useCreatePostMutation();
+  const [uploadImages, { isLoading: isUploadLoading, error: uploadError }] =
+    useUploadImagesMutation();
+  const user = useSelector(selectUser);
+  const { refetch } = useGetPostsByUserIdQuery({
+    id: user?.id,
+    postType: postForm?.postType ?? 'Phòng',
+  });
+  const toast = useToast();
+  const normalizeUri = (uri: string) => {
+    if (Platform.OS === 'android') {
+      return uri.replace('file://', '');
+    }
+    return uri;
+  };
 
   const handlePost = async () => {
     if (postForm != null) {
-      const data: CreatePostModel = {
-        ...postForm,
-        addressId: addressId,
-        customerNote: customerNote,
-        paymentType: paymentType,
-      };
+      const { images, ...data } = postForm;
+
       const res = await createPost(data);
-      if (error || res.data?.returnCode != 1000) {
+      if (error) {
         toast.show({
           placement: 'top',
           duration: 3000,
@@ -76,148 +75,307 @@ const Checkout = () => {
             const uniqueToastId = 'toast-' + id;
             return (
               <Toast nativeID={uniqueToastId} action="error" variant="outline">
-                <ToastTitle>Đăng công việc thất bại</ToastTitle>
-                <ToastDescription>{res.error.data.message}</ToastDescription>
+                <ToastTitle>Đăng phòng thất bại</ToastTitle>
               </Toast>
             );
           },
         });
       } else {
-        toast.show({
-          placement: 'top',
-          duration: 3000,
-          render: ({ id }) => {
-            const uniqueToastId = 'toast-' + id;
-            return (
-              <Toast
-                nativeID={uniqueToastId}
-                action="success"
-                variant="outline"
-              >
-                <ToastTitle>Thành công</ToastTitle>
-                <ToastDescription>Đăng công việc thành công</ToastDescription>
-              </Toast>
-            );
-          },
-        });
-        dispatch(clearPostForm());
+        if (images && res?.data && res.data.id) {
+          console.log(res.data.id);
+          const formData = new FormData();
+          // for (const [index, uri] of images.entries()) {
+          //   const response = await fetch(uri); // Fetch ảnh từ URI
+          //   const blob = await response.blob(); // Chuyển URI thành Blob
 
-        router.dismissTo(`/Post?workType=${workType}`);
+          //   formData.append('files', blob, `image-${index}.jpg`); // Thêm vào FormData
+          // }
+
+          images.forEach((image, index) => {
+            if (image.uri && image.type && image.name) {
+              formData.append('files', {
+                uri: image.uri,
+                type: image.type,
+                name: image.name,
+              } as any); // Thêm `as any` để tránh lỗi TypeScript
+            } else {
+              console.warn(
+                `Image at index ${index} is missing required fields.`,
+              );
+            }
+          });
+
+          const uploadRes = await uploadImages({
+            id: res.data?.id,
+            formData: formData,
+          });
+
+          if (uploadError) {
+            toast.show({
+              placement: 'top',
+              duration: 3000,
+              render: ({ id }) => {
+                const uniqueToastId = 'toast-' + id;
+                return (
+                  <Toast
+                    nativeID={uniqueToastId}
+                    action="error"
+                    variant="outline"
+                  >
+                    <ToastTitle>Đăng ảnh thất bại</ToastTitle>
+                    <ToastDescription>
+                      {uploadError.data.message}
+                    </ToastDescription>
+                  </Toast>
+                );
+              },
+            });
+          } else {
+            refetch();
+            toast.show({
+              placement: 'top',
+              duration: 3000,
+              render: ({ id }) => {
+                const uniqueToastId = 'toast-' + id;
+                return (
+                  <Toast
+                    nativeID={uniqueToastId}
+                    action="success"
+                    variant="outline"
+                  >
+                    <ToastTitle>Thành công</ToastTitle>
+                    <ToastDescription>Đăng phòng thành công</ToastDescription>
+                  </Toast>
+                );
+              },
+            });
+            dispatch(clearPostForm());
+
+            router.dismissTo(`/(rooms)/RoomManagement`);
+          }
+        } else {
+          refetch();
+          toast.show({
+            placement: 'top',
+            duration: 3000,
+            render: ({ id }) => {
+              const uniqueToastId = 'toast-' + id;
+              return (
+                <Toast
+                  nativeID={uniqueToastId}
+                  action="success"
+                  variant="outline"
+                >
+                  <ToastTitle>Thành công</ToastTitle>
+                  <ToastDescription>Đăng phòng thành công</ToastDescription>
+                </Toast>
+              );
+            },
+          });
+          dispatch(clearPostForm());
+
+          router.dismissTo(`/(rooms)/RoomManagement`);
+        }
       }
     }
   };
 
   return (
     <SafeAreaView className="flex h-full">
-      <LinearGradient
-        // Background Linear Gradient
-        colors={['#ebf7eb', 'transparent', '#ffffff']}
-        className="absolute h-[1000px] left-0 right-0 top-0"
-      />
       <ScrollView>
         <Box className="overflow-y-auto m-3">
           <VStack space="md">
-            <PostAddress canChange={true} />
-            <PostInfo workType={workType} postForm={postForm} />
-            <Card size="md" variant="elevated" className="shadow-2xl">
-              <VStack space="md">
-                <Heading>Hình thức thanh toán</Heading>
-                <VStack
-                  space="md"
-                  className="border p-4 rounded-lg border-secondary-50"
-                >
-                  <RadioGroup value={paymentType} onChange={setPaymentType}>
-                    <VStack space="lg">
-                      <Radio
-                        value="QR"
-                        size="lg"
-                        isInvalid={false}
-                        isDisabled={false}
-                        className="flex flex-row justify-between items-center"
-                      >
-                        <HStack space="md" className="items-center">
-                          <Text className="text-md">
-                            <Ionicons name="qr-code-outline" size={20} />
-                          </Text>
-                          <RadioLabel>Trừ vào số dư</RadioLabel>
-                        </HStack>
+            <Card size="md" variant="elevated">
+              <Heading className="mb-4">Thông tin cơ bản</Heading>
+              <VStack space="lg">
+                <HStack space="md" className="items-center">
+                  <HStack space="xs" className="items-center">
+                    <Text className="font-medium text-lg">Tiêu đề</Text>
+                    <Text className="font-medium text-info-400">
+                      <Ionicons name="text-outline" size={20} />
+                    </Text>
+                    <Text className="font-medium">:</Text>
+                  </HStack>
+                  <Text className="text-lg w-2/3">{postForm?.name}</Text>
+                </HStack>
+                <HStack space="md" className="items-center">
+                  <HStack space="xs" className="items-center">
+                    <Text className="font-medium text-lg">Giá thuê</Text>
+                    <Text className="font-medium text-success-400">
+                      <Ionicons name="cash-outline" size={20} />
+                    </Text>
+                    <Text className="font-medium">:</Text>
+                  </HStack>
+                  <Text className="text-lg w-2/3 text-success-400">
+                    {postForm?.price.toLocaleString()} VND
+                  </Text>
+                </HStack>
+                {postForm?.deposit !== 0 && (
+                  <HStack space="md" className="items-center">
+                    <HStack space="xs" className="items-center">
+                      <Text className="font-medium text-lg">Đặt cọc</Text>
+                      <Text className="font-medium text-success-400">
+                        <Ionicons name="cash-outline" size={20} />
+                      </Text>
+                      <Text className="font-medium">:</Text>
+                    </HStack>
+                    <Text className="text-lg w-2/3">
+                      {postForm?.deposit.toLocaleString()} VND
+                    </Text>
+                  </HStack>
+                )}
 
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon} />
-                        </RadioIndicator>
-                      </Radio>
-                      <Radio
-                        value="CASH"
-                        size="lg"
-                        isInvalid={false}
-                        isDisabled={false}
-                        className="flex flex-row justify-between items-center"
-                      >
-                        <HStack space="md" className="items-center">
-                          <Text className="text-md text-green-600">
-                            <Ionicons name="cash-outline" size={20} />
-                          </Text>
-                          <RadioLabel>Thanh toán tiền mặt</RadioLabel>
-                        </HStack>
+                <HStack space="md" className="items-center">
+                  <HStack space="xs" className="items-center">
+                    <Text className="font-medium text-lg">Diện tích</Text>
+                    <Text className="font-medium text-secondary-400">
+                      <Ionicons name="square" size={20} />
+                    </Text>
+                    <Text className="font-medium">:</Text>
+                  </HStack>
+                  <Text className="text-lg w-2/3">{postForm?.area} m²</Text>
+                </HStack>
 
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon} />
-                        </RadioIndicator>
-                      </Radio>
-                    </VStack>
-                  </RadioGroup>
-                </VStack>
+                <HStack space="md" className="items-center">
+                  <HStack space="xs" className="items-center">
+                    <Text className="font-medium text-lg">Số tầng</Text>
+                    <Text className="font-medium text-info-400">
+                      <Ionicons name="cellular" size={20} />
+                    </Text>
+                    <Text className="font-medium">:</Text>
+                  </HStack>
+                  <Text className="text-lg w-2/3">{postForm?.floor}</Text>
+                </HStack>
+
+                <HStack space="md" className="items-center">
+                  <HStack space="xs" className="items-center">
+                    <Text className="font-medium text-lg">Số người</Text>
+                    <Text className="font-medium text-success-400">
+                      <Ionicons name="people" size={20} />
+                    </Text>
+                    <Text className="font-medium">:</Text>
+                  </HStack>
+                  <Text className="text-lg">{postForm?.capacity}</Text>
+                </HStack>
+
+                {postForm?.gender &&
+                  ['Nam', 'Nữ'].includes(postForm.gender) && (
+                    <HStack space="md" className="items-center">
+                      <Text className="font-medium text-lg">
+                        Yêu cầu giới tính :
+                      </Text>
+                      <HStack space="xs" className="items-center">
+                        {postForm.gender === 'Nam' ? (
+                          <Text className="font-medium text-info-400">
+                            <Ionicons name="male" size={20} />
+                          </Text>
+                        ) : (
+                          <Text className="font-medium text-error-400">
+                            <Ionicons name="female" size={20} />
+                          </Text>
+                        )}
+
+                        <Text className="text-lg w-2/3">
+                          {postForm?.gender}
+                        </Text>
+                      </HStack>
+                    </HStack>
+                  )}
+
+                <HStack space="md" className="items-center">
+                  <HStack space="xs" className="items-center">
+                    <Text className="font-medium text-lg">Địa chỉ</Text>
+                    <Text className="font-medium text-error-400">
+                      <Ionicons name="location" size={20} />
+                    </Text>
+                    <Text className="font-medium">:</Text>
+                  </HStack>
+                  <Text className="text-lg w-2/3">{postForm?.address}</Text>
+                </HStack>
               </VStack>
             </Card>
-            <Card size="md" variant="elevated" className="shadow-2xl">
-              <VStack space="md">
-                <Heading>Ghi chú cho Freelancers</Heading>
-                <Text className="text-gray-500">
-                  Ghi chú giúp Freelancers làm tốt hơn
-                </Text>
-                <Textarea
-                  size="md"
-                  isReadOnly={false}
-                  isInvalid={false}
-                  isDisabled={false}
-                >
-                  <TextareaInput
-                    value={customerNote}
-                    onChangeText={setCustomerNote}
-                    placeholder="Ghi chú dành cho Freelancers ở đây..."
-                  />
-                </Textarea>
+
+            <Card size="md" variant="elevated">
+              <Heading className="mb-4">Loại phòng và tiện nghi</Heading>
+              <VStack space="lg">
+                <HStack space="md" className="items-center">
+                  <HStack space="xs" className="items-center">
+                    <Text className="font-medium text-lg">Loại phòng</Text>
+                    <Text className="font-medium text-success-400">
+                      <Ionicons name="home-outline" size={20} />
+                    </Text>
+                    <Text className="font-medium">:</Text>
+                  </HStack>
+                  <Text className="text-lg w-2/3">{postForm?.roomType}</Text>
+                </HStack>
+
+                <HStack space="md" className="items-center">
+                  <HStack space="xs" className="items-center">
+                    <Text className="font-medium text-lg">Tiện nghi</Text>
+                    <Text className="font-medium text-info-400">
+                      <Ionicons name="construct-outline" size={20} />
+                    </Text>
+                    <Text className="font-medium">:</Text>
+                  </HStack>
+                  <Text className="text-lg w-2/3">
+                    {postForm?.utilities !== ''
+                      ? postForm?.utilities
+                      : 'Không có'}
+                  </Text>
+                </HStack>
+                <HStack space="md" className="items-center">
+                  <HStack space="xs" className="items-center">
+                    <Text className="font-medium text-lg">Nội thất</Text>
+                    <Text className="font-medium text-tertiary-400">
+                      <Ionicons name="bed-outline" size={20} />
+                    </Text>
+                    <Text className="font-medium">:</Text>
+                  </HStack>
+                  <Text className="text-lg w-2/3">
+                    {postForm?.interior !== ''
+                      ? postForm?.interior
+                      : 'Không có'}
+                  </Text>
+                </HStack>
               </VStack>
             </Card>
+
+            {postForm?.images && (
+              <Card size="md" variant="elevated">
+                <Heading className="mb-4">Hình ảnh phòng</Heading>
+                <HStack space="md" className="flex flex-row flex-wrap">
+                  {postForm?.images.map((image, index) => (
+                    <Box key={index} className="relative w-1/4 h-24">
+                      <Image
+                        source={{ uri: image.uri }}
+                        className="rounded-lg w-full h-full"
+                      />
+                    </Box>
+                  ))}
+                </HStack>
+              </Card>
+            )}
+
+            {postForm?.description && (
+              <Card size="md" variant="elevated">
+                <Heading className="mb-4">Mô tả chi tiết</Heading>
+                <Text className="text-lg">{postForm?.description}</Text>
+              </Card>
+            )}
           </VStack>
         </Box>
-        <ScrollPickerModal
-          showPickerModal={showPickerModal}
-          setShowPickerModal={setShowPickerModal}
-          setSelectedHour={setSelectedHour}
-          setSelectedMinute={setSelectedMinute}
-          selectedHour={selectedHour}
-          selectedMinute={selectedMinute}
-        />
       </ScrollView>
+
       <Box className="sticky bg-white p-4 rounded-t-lg shadow-lg">
-        <VStack space="md">
-          <Box className="flex flex-row justify-between items-center">
-            <Text className="text-xl font-semibold">Tổng cộng:</Text>
-            <Text className="text-xl font-semibold text-success-400">
-              {postForm?.price.toLocaleString()} VND
-            </Text>
-          </Box>
-          <Button
-            size="xl"
-            className="bg-success-300 flex flex-row items-center justify-center"
-            action="positive"
-            onPress={handlePost}
-          >
-            {isLoading && <ButtonSpinner className="text-secondary-50" />}
-            <ButtonText>Đăng việc</ButtonText>
-          </Button>
-        </VStack>
+        <Button
+          onPress={handlePost}
+          size="xl"
+          className="bg-success-300 flex flex-row items-center justify-center"
+          action="positive"
+        >
+          <ButtonText className="text-center">Đăng phòng</ButtonText>
+          {(isLoading || isUploadLoading) && <ButtonSpinner />}
+        </Button>
       </Box>
     </SafeAreaView>
   );

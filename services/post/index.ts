@@ -1,17 +1,17 @@
-import { API } from "../base";
-import { Response } from "@/types/response";
+import { API } from '../base';
+import { Response } from '@/types/response';
 import {
   CreatePostModel,
   CreateTakePostModel,
   PostModel,
   RoomDetailModel,
   TakePostModel,
-} from "@/types/postTypes";
+} from '@/types/postTypes';
 
-const baseUrl = "/posts";
+const baseUrl = '/posts';
 
 const postApi = API.injectEndpoints({
-  endpoints: (build) => ({
+  endpoints: build => ({
     getPosts: build.query<
       PostModel[],
       {
@@ -41,43 +41,41 @@ const postApi = API.injectEndpoints({
         priceTo,
         name,
       }) => {
-        // Tạo query string từ các tham số truyền vào
         const params = new URLSearchParams();
 
-        params.append("postType", postType);
+        params.append('postType', postType);
 
         if (offset !== undefined) {
-          params.append("offset", offset.toString());
+          params.append('offset', offset.toString());
         }
         if (limit !== undefined) {
-          params.append("limit", limit.toString());
+          params.append('limit', limit.toString());
         }
         if (sortBy) {
-          params.append("sortBy", sortBy);
+          params.append('sortBy', sortBy);
         }
         if (roomType) {
-          params.append("roomType", roomType);
+          params.append('roomType', roomType);
         }
         if (utilities) {
-          params.append("utilities", utilities);
+          params.append('utilities', utilities);
         }
         if (interior) {
-          params.append("interior", interior);
+          params.append('interior', interior);
         }
         if (address) {
-          params.append("address", address);
+          params.append('address', address);
         }
         if (priceFrom !== undefined) {
-          params.append("priceFrom", priceFrom.toString());
+          params.append('priceFrom', priceFrom.toString());
         }
         if (priceTo !== undefined) {
-          params.append("priceTo", priceTo.toString());
+          params.append('priceTo', priceTo.toString());
         }
         if (name) {
-          params.append("name", name);
+          params.append('name', name);
         }
 
-        // Kết hợp base URL và query string
         return `${baseUrl}?${params.toString()}`;
       },
     }),
@@ -96,49 +94,61 @@ const postApi = API.injectEndpoints({
     getPostsByUserId: build.query<
       PostModel[],
       {
-        id: number;
+        id?: number;
+        postType: string;
+        offset?: number;
+        limit?: number;
       }
     >({
-      query: ({ id }) => {
-        return `/users/${id}${baseUrl}`;
+      query: ({ id, postType, offset, limit }) => {
+        const params = new URLSearchParams();
+
+        params.append('postType', postType);
+
+        if (offset !== undefined) {
+          params.append('offset', offset.toString());
+        }
+        if (limit !== undefined) {
+          params.append('limit', limit.toString());
+        }
+        return `/users/${id}${baseUrl}?${params.toString()}`;
       },
       // providesTags: (result, error, { id }) => [
-      //   { type: 'PostsByCustomerId', id },
+      //   { type: 'PostsByUserId', id },
       // ],
     }),
 
-    createPost: build.mutation<Response<PostModel>, Partial<CreatePostModel>>({
+    createPost: build.mutation<PostModel, Partial<CreatePostModel>>({
       query: (newPost: CreatePostModel) => ({
         url: `${baseUrl}`,
-        method: "POST",
+        method: 'POST',
         body: newPost,
       }),
-      invalidatesTags: (result, error, newPost) => [
-        { type: "PostsByCustomerId", id: newPost.customerId }, // Đánh dấu các cache liên quan cần làm mới
-      ],
-    }),
-
-    takePost: build.mutation<
-      Response<TakePostModel>,
-      Partial<CreateTakePostModel>
-    >({
-      query: (createTakePost: CreateTakePostModel) => {
-        const { id, ...body } = createTakePost;
-        return {
-          url: `${baseUrl}/${id}/takePost`,
-          method: "PUT",
-          body: body,
-        };
-      },
-      invalidatesTags: (result, error, takePost) => [
-        { type: "TakePostsByFreelancerId", id: takePost.freelancerId }, // Đánh dấu các cache liên quan cần làm mới
-      ],
+      // invalidatesTags: (result, error, newPost) => [
+      //   { type: 'PostsByUserId', id: newPost. }, // Đánh dấu các cache liên quan cần làm mới
+      // ],
     }),
     getAllPosts: build.query<RoomDetailModel[], void>({
       query: () => {
         return `${baseUrl}/`;
       },
     }),
+
+    uploadImages: build.mutation<PostModel, { id: number; formData: FormData }>(
+      {
+        query: ({ id, formData }) => {
+          return {
+            url: `${baseUrl}/${id}/pictures`,
+            method: 'POST',
+            body: formData,
+          };
+        },
+        // Nếu muốn làm mới cache liên quan, có thể sử dụng invalidatesTags
+        // invalidatesTags: (result, error, { id }) => [
+        //   { type: 'PostsByCustomerId', id },
+        // ],
+      },
+    ),
   }),
 });
 
@@ -146,7 +156,7 @@ export const {
   useCreatePostMutation,
   useGetPostsQuery,
   useGetPostByIdQuery,
-  useTakePostMutation,
   useGetPostsByUserIdQuery,
   useGetAllPostsQuery,
+  useUploadImagesMutation,
 } = postApi;

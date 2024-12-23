@@ -6,8 +6,7 @@ export interface AdminModel {
 
 export interface UserModel {
   id: number;
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   phone: string;
   birthdate: Date;

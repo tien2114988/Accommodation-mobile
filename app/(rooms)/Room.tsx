@@ -14,6 +14,8 @@ import { Divider } from '@/components/ui/divider';
 import { Grid, GridItem } from '@/components/ui/grid';
 import { stringToArray } from '@/utils/stringUtil';
 import RoomDetailSkeleton from '@/components/skeleton/RoomDetailSkeleton';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/store/reducers';
 
 const room = {
   thumbnail:
@@ -27,6 +29,7 @@ const room = {
 };
 
 const Room = () => {
+  const user = useSelector(selectUser);
   const { id } = useLocalSearchParams();
   const { data, error, isFetching } = useGetPostByIdQuery({ id: +id });
   const toast = useToast();
@@ -62,7 +65,11 @@ const Room = () => {
           <Image
             size="2xl"
             source={{
-              uri: `${room.thumbnail}`,
+              uri:
+                data && data.pictures.length > 0
+                  ? 'https://accomodation-seeking-backend.onrender.com/pictures/' +
+                    data.pictures[0]
+                  : 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg',
             }}
             alt="image"
             className="rounded-lg w-full"
@@ -212,9 +219,13 @@ const Room = () => {
                     className="rounded-full"
                   />
                   <VStack space="md">
-                    <Text className="text-lg font-medium">
-                      {data?.postedBy.firstName + ' ' + data?.postedBy.lastName}
-                    </Text>
+                    <HStack space="sm" className="items-center">
+                      <Text className="text-lg font-medium">
+                        {data?.postedBy.name}
+                      </Text>
+
+                      {data?.postedBy.id === user?.id && <Text>(Bạn) </Text>}
+                    </HStack>
                     <Text className="text-info-400">
                       {data?.postedBy.postCount} bài đăng
                     </Text>

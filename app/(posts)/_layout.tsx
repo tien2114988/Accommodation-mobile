@@ -9,27 +9,33 @@ export default function PostsLayout() {
       }}
     >
       <Stack.Screen
-        name="PostDetail"
-        options={{ headerShown: true, title: 'Thông tin công việc' }}
-      />
-      <Stack.Screen
-        name="Post"
+        name="PostForm"
         options={{
-          title: 'Đăng công việc',
+          title: 'Thông tin cơ bản',
           headerShown: true,
+          headerShadowVisible: false,
         }}
       />
       <Stack.Screen
-        name="PostForm"
+        name="RoomTypeForm"
         options={{
-          title: 'Thông tin công việc',
+          title: 'Tiện nghi và loại phòng',
           headerShown: true,
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="DescriptionForm"
+        options={{
+          title: 'Hình ảnh và mô tả',
+          headerShown: true,
+          headerShadowVisible: false,
         }}
       />
       <Stack.Screen
         name="Checkout"
         options={{
-          title: 'Xác nhận và thanh toán',
+          title: 'Xác nhận và đăng phòng',
           headerShown: true,
         }}
       />

@@ -58,7 +58,10 @@ const Search = () => {
   const [interior, setInterior] = useState<string>('');
   const [address, setAddress] = useState<string>('');
 
-  const [params, setParams] = useState<FilterType>({ postType: 'Phòng' });
+  const [params, setParams] = useState<FilterType>({
+    postType: 'Phòng',
+    sortBy: 'time',
+  });
 
   const debounceSearch = useDebounce(name, 1000);
 
