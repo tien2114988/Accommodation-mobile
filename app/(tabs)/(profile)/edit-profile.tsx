@@ -243,7 +243,7 @@ const EditProfile = () => {
                   </FormControlLabelText>
                 </FormControlLabel>
                 <View className="w-full">
-                  {!showPicker && (
+                  {
                     <Pressable onPress={() => toggleDatepicker()}>
                       <Input
                         size="lg"
@@ -264,7 +264,7 @@ const EditProfile = () => {
                         />
                       </Input>
                     </Pressable>
-                  )}
+                  }
                   {showPicker && (
                     <DateTimePicker
                       style={[
@@ -306,7 +306,7 @@ const EditProfile = () => {
                 <FormControlError>
                   <FormControlErrorIcon as={AlertCircleIcon} />
                   <FormControlErrorText>
-                    {/* {formik.errors.birthdate} */}
+                    {formik.errors.birthdate}
                   </FormControlErrorText>
                 </FormControlError>
               </FormControl>

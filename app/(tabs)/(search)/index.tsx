@@ -1,12 +1,5 @@
-import { selectUser } from '@/store/reducers';
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-  NativeSyntheticEvent,
-  SafeAreaView,
-  TextInputEndEditingEventData,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Box } from '@/components/ui/box';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -25,8 +18,6 @@ import { Toast, ToastTitle, useToast } from '@/components/ui/toast';
 import { useGetPostsQuery } from '@/services/post';
 import RoomSkeleton from '@/components/skeleton/RoomSkeleton';
 import { useDebounce } from '@/utils/helper';
-import { useGetProvincesQuery } from '@/services';
-import { DistrictModel, ProvinceModel } from '@/types/addressTypes';
 import { Mode } from '@/constants/room';
 
 interface FilterType {
@@ -129,172 +120,166 @@ const Search = () => {
   };
 
   return (
-    <SafeAreaView className="flex bg-white">
+    <SafeAreaView className="bg-white h-full">
+      <Box className="flex flex-row justify-between items-center bg-info-700 p-4">
+        <Pressable onPress={() => handleFilter(Mode.FILTER)}>
+          {({ pressed }) => (
+            <Text className={`text-white hidden ${pressed && 'opacity-75'}`}>
+              <Ionicons size={24} name="chevron-back-outline" />
+            </Text>
+          )}
+        </Pressable>
+
+        <Input variant="outline" size="lg" className="w-2/3 border-0 bg-white">
+          <InputSlot className="pl-3">
+            <InputIcon as={SearchIcon} />
+          </InputSlot>
+          <InputField
+            className="leading-none"
+            type="text"
+            value={name}
+            onChangeText={text => setName(text)}
+            placeholder="Tìm kiếm phòng"
+          />
+        </Input>
+
+        <Pressable onPress={() => handleFilter(Mode.FILTER)}>
+          {({ pressed }) => (
+            <Text className={`text-white ${pressed && 'opacity-75'}`}>
+              <Ionicons size={24} name="options-outline" />
+            </Text>
+          )}
+        </Pressable>
+      </Box>
       <Box className="">
-        <Box className="flex flex-row justify-between items-center bg-info-700 p-4">
-          <Pressable onPress={() => handleFilter(Mode.FILTER)}>
-            {({ pressed }) => (
-              <Text className={`text-white hidden ${pressed && 'opacity-75'}`}>
-                <Ionicons size={24} name="chevron-back-outline" />
-              </Text>
-            )}
-          </Pressable>
-
-          <Input
-            variant="outline"
-            size="lg"
-            className="w-2/3 border-0 bg-white"
-          >
-            <InputSlot className="pl-3">
-              <InputIcon as={SearchIcon} />
-            </InputSlot>
-            <InputField
-              className="leading-none"
-              type="text"
-              value={name}
-              onChangeText={text => setName(text)}
-              placeholder="Tìm kiếm phòng"
-            />
-          </Input>
-
-          <Pressable onPress={() => handleFilter(Mode.FILTER)}>
-            {({ pressed }) => (
-              <Text className={`text-white ${pressed && 'opacity-75'}`}>
-                <Ionicons size={24} name="options-outline" />
-              </Text>
-            )}
-          </Pressable>
-        </Box>
-        <Box className="">
-          <Box className="p-3 flex flex-row justify-between items-center">
-            <HStack space="md">
-              <Pressable onPress={() => handleFilter(Mode.ROOMTYPE)}>
-                {({ pressed }) => (
-                  <HStack
-                    space="xs"
-                    className={`items-center ${pressed && 'opacity-75'}`}
-                  >
-                    <Text>Loại phòng</Text>
-                    <Text className="text-secondary-400">
-                      <Ionicons size={18} name="chevron-down-outline" />
-                    </Text>
-                  </HStack>
-                )}
-              </Pressable>
-              <Pressable onPress={() => handleFilter(Mode.PRICE)}>
-                {({ pressed }) => (
-                  <HStack
-                    space="xs"
-                    className={`items-center ${pressed && 'opacity-75'}`}
-                  >
-                    <Text>Khoảng giá</Text>
-                    <Text className="text-secondary-400">
-                      <Ionicons size={18} name="chevron-down-outline" />
-                    </Text>
-                  </HStack>
-                )}
-              </Pressable>
-            </HStack>
-            <Pressable onPress={() => handleFilter(Mode.SORT)}>
+        <Box className="p-3 flex flex-row justify-between items-center">
+          <HStack space="md">
+            <Pressable onPress={() => handleFilter(Mode.ROOMTYPE)}>
               {({ pressed }) => (
                 <HStack
                   space="xs"
                   className={`items-center ${pressed && 'opacity-75'}`}
                 >
-                  <Text>Sắp xếp theo</Text>
+                  <Text>Loại phòng</Text>
                   <Text className="text-secondary-400">
                     <Ionicons size={18} name="chevron-down-outline" />
                   </Text>
                 </HStack>
               )}
             </Pressable>
-          </Box>
-
-          <Box className="mx-3">
-            <Divider />
-          </Box>
-
-          <Box className="p-3">
-            <Pressable onPress={() => handleFilter(Mode.LOCATION)}>
+            <Pressable onPress={() => handleFilter(Mode.PRICE)}>
               {({ pressed }) => (
-                <Box
-                  className={`flex flex-row items-center justify-between ${
-                    pressed && 'opacity-75'
-                  }`}
+                <HStack
+                  space="xs"
+                  className={`items-center ${pressed && 'opacity-75'}`}
                 >
-                  <HStack space="xs" className="items-center w-11/12">
-                    <Text className="text-error-400">
-                      <Ionicons size={20} name="location" />
-                    </Text>
-                    <Text>Khu vực : {address ? address : 'Tất cả'}</Text>
-                  </HStack>
+                  <Text>Khoảng giá</Text>
                   <Text className="text-secondary-400">
-                    <Ionicons size={20} name="chevron-down-outline" />
+                    <Ionicons size={18} name="chevron-down-outline" />
                   </Text>
-                </Box>
+                </HStack>
               )}
             </Pressable>
-          </Box>
-          {isFetching ? (
-            <RoomSkeleton />
-          ) : (
-            <RoomList rooms={data ?? []} refetch={refetch} />
-          )}
+          </HStack>
+          <Pressable onPress={() => handleFilter(Mode.SORT)}>
+            {({ pressed }) => (
+              <HStack
+                space="xs"
+                className={`items-center ${pressed && 'opacity-75'}`}
+              >
+                <Text>Sắp xếp theo</Text>
+                <Text className="text-secondary-400">
+                  <Ionicons size={18} name="chevron-down-outline" />
+                </Text>
+              </HStack>
+            )}
+          </Pressable>
         </Box>
 
-        <RoomTypeFilter
-          showActionSheet={showActionSheet}
-          mode={mode}
-          handleClose={handleClose}
-          currentRoomTypes={roomType}
-          setRoomType={setRoomType}
-          handleRoomTypeFilter={handleRoomTypeFilter}
-        />
+        <Box className="mx-3">
+          <Divider />
+        </Box>
 
-        <PriceFilter
-          showActionSheet={showActionSheet}
-          mode={mode}
-          handleClose={handleClose}
-          priceTo={priceTo}
-          setPriceTo={setPriceTo}
-          handleFilterPrice={handleFilterPrice}
-        />
-
-        <RoomSort
-          showActionSheet={showActionSheet}
-          mode={mode}
-          handleClose={handleClose}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          handleSort={handleSort}
-        />
-
-        <LocationFilter
-          showActionSheet={showActionSheet}
-          mode={mode}
-          address={address}
-          setAddress={setAddress}
-          handleFilterLocation={handleFilterLocation}
-          handleClose={handleClose}
-        />
-
-        <RoomFilter
-          showActionSheet={showActionSheet}
-          mode={mode}
-          currentRoomTypes={roomType}
-          setRoomType={setRoomType}
-          handleClose={handleClose}
-          priceTo={priceTo}
-          setPriceTo={setPriceTo}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          utilities={utilities}
-          setUtilities={setUtilities}
-          currentInteriors={interior}
-          setInterior={setInterior}
-          handleAllFilter={handleAllFilter}
-        />
+        <Box className="p-3">
+          <Pressable onPress={() => handleFilter(Mode.LOCATION)}>
+            {({ pressed }) => (
+              <Box
+                className={`flex flex-row items-center justify-between ${
+                  pressed && 'opacity-75'
+                }`}
+              >
+                <HStack space="xs" className="items-center w-11/12">
+                  <Text className="text-error-400">
+                    <Ionicons size={20} name="location" />
+                  </Text>
+                  <Text>Khu vực : {address ? address : 'Tất cả'}</Text>
+                </HStack>
+                <Text className="text-secondary-400">
+                  <Ionicons size={20} name="chevron-down-outline" />
+                </Text>
+              </Box>
+            )}
+          </Pressable>
+        </Box>
+        {isFetching ? (
+          <RoomSkeleton />
+        ) : (
+          <RoomList rooms={data ?? []} refetch={refetch} />
+        )}
       </Box>
+
+      <RoomTypeFilter
+        showActionSheet={showActionSheet}
+        mode={mode}
+        handleClose={handleClose}
+        currentRoomTypes={roomType}
+        setRoomType={setRoomType}
+        handleRoomTypeFilter={handleRoomTypeFilter}
+      />
+
+      <PriceFilter
+        showActionSheet={showActionSheet}
+        mode={mode}
+        handleClose={handleClose}
+        priceTo={priceTo}
+        setPriceTo={setPriceTo}
+        handleFilterPrice={handleFilterPrice}
+      />
+
+      <RoomSort
+        showActionSheet={showActionSheet}
+        mode={mode}
+        handleClose={handleClose}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        handleSort={handleSort}
+      />
+
+      <LocationFilter
+        showActionSheet={showActionSheet}
+        mode={mode}
+        address={address}
+        setAddress={setAddress}
+        handleFilterLocation={handleFilterLocation}
+        handleClose={handleClose}
+      />
+
+      <RoomFilter
+        showActionSheet={showActionSheet}
+        mode={mode}
+        currentRoomTypes={roomType}
+        setRoomType={setRoomType}
+        handleClose={handleClose}
+        priceTo={priceTo}
+        setPriceTo={setPriceTo}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        utilities={utilities}
+        setUtilities={setUtilities}
+        currentInteriors={interior}
+        setInterior={setInterior}
+        handleAllFilter={handleAllFilter}
+      />
     </SafeAreaView>
   );
 };

@@ -49,6 +49,7 @@ const PostForm = () => {
     utilities: '',
     interior: '',
     roomType: '',
+    gender: 'Nam',
     postType: type === 'room' ? 'Phòng' : 'Ở ghép',
   };
   const [post, setPost] = useState<CreatePostModel>(initialPost);
@@ -281,7 +282,7 @@ const PostForm = () => {
                   <FormControlLabel>
                     <HStack space="md" className="items-center">
                       <FormControlLabelText className="text-lg">
-                        Yêu cầu giới tính (nếu có)
+                        Yêu cầu giới tính
                       </FormControlLabelText>
                       <FormControlLabelText className="text-lg text-success-400">
                         <Ionicons name="male-female-outline" size={20} />
@@ -325,16 +326,20 @@ const PostForm = () => {
                           <RadioIcon as={CircleIcon} />
                         </RadioIndicator>
                       </Radio>
-                      <Radio
-                        value=""
-                        size="lg"
-                        className="flex flex-row justify-between items-center"
-                      >
-                        <RadioLabel>Không</RadioLabel>
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon} />
-                        </RadioIndicator>
-                      </Radio>
+                      {post.postType === 'Phòng' ? (
+                        <Radio
+                          value="Khác"
+                          size="lg"
+                          className={`flex flex-row justify-between items-center`}
+                        >
+                          <RadioLabel>Không</RadioLabel>
+                          <RadioIndicator>
+                            <RadioIcon as={CircleIcon} />
+                          </RadioIndicator>
+                        </Radio>
+                      ) : (
+                        <Box></Box>
+                      )}
                     </Box>
                   </RadioGroup>
                 </FormControl>

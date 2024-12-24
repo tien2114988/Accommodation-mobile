@@ -61,7 +61,7 @@ const Checkout = () => {
       const { images, ...data } = postForm;
 
       const res = await createPost(data);
-      if (error) {
+      if (res.error) {
         toast.show({
           placement: 'top',
           duration: 3000,
@@ -70,6 +70,7 @@ const Checkout = () => {
             return (
               <Toast nativeID={uniqueToastId} action="error" variant="outline">
                 <ToastTitle>Đăng phòng thất bại</ToastTitle>
+                <ToastDescription>{res.error.data.message}</ToastDescription>
               </Toast>
             );
           },
@@ -104,7 +105,7 @@ const Checkout = () => {
             formData: formData,
           });
 
-          if (uploadError) {
+          if (uploadRes.error) {
             toast.show({
               placement: 'top',
               duration: 3000,

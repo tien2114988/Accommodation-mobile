@@ -130,7 +130,7 @@ const PairSearch = () => {
   };
 
   return (
-    <SafeAreaView className="flex h-full bg-white">
+    <SafeAreaView className="h-full bg-white">
       <Box className="flex flex-row justify-between items-center bg-info-700 p-4">
         <Pressable onPress={handleBack}>
           {({ pressed }) => (

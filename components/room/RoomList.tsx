@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   ListRenderItemInfo,
   RefreshControl,
@@ -10,7 +9,7 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { Pressable } from '@/components/ui/pressable';
-import { PostModel, TakePostModel } from '@/types/postTypes';
+import { PostModel } from '@/types/postTypes';
 import { Box } from '@/components/ui/box';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Divider } from '../ui/divider';
@@ -94,6 +93,8 @@ const RoomList = ({ rooms, refetch }: Props) => {
     );
   };
 
+  console.log(rooms);
+
   if (rooms.length <= 0) {
     return (
       <ScrollView
@@ -112,22 +113,20 @@ const RoomList = ({ rooms, refetch }: Props) => {
   }
 
   return (
-    <Box className="mb-10">
-      <FlatList
-        data={rooms}
-        renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+    <FlatList
+      data={rooms}
+      renderItem={renderItem}
+      keyExtractor={item => item.id.toString()}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
 
-        // onEndReached={loadMore}
-        // onEndReachedThreshold={0.5}
-        // ListFooterComponent={
-        //   isFetching ? <ActivityIndicator size="small" /> : null
-        // }
-      />
-    </Box>
+      // onEndReached={loadMore}
+      // onEndReachedThreshold={0.5}
+      // ListFooterComponent={
+      //   isFetching ? <ActivityIndicator size="small" /> : null
+      // }
+    />
   );
 };
 
