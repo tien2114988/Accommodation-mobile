@@ -1,21 +1,21 @@
-import { Stack, useNavigationContainerRef } from "expo-router";
-import "@/global.css";
-import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import * as SplashScreen from "expo-splash-screen";
-import "react-native-reanimated";
-import React, { useEffect } from "react";
-import "../global.css";
-import { useFonts } from "expo-font";
-import { PersistGate } from "redux-persist/integration/react";
-import { persistor, store } from "@/store";
-import { Provider } from "react-redux";
+import { Stack, useNavigationContainerRef } from 'expo-router';
+import '@/global.css';
+import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
+import * as SplashScreen from 'expo-splash-screen';
+import 'react-native-reanimated';
+import React, { useEffect } from 'react';
+import '../global.css';
+import { useFonts } from 'expo-font';
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistor, store } from '@/store';
+import { Provider } from 'react-redux';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-import { getLocales } from "expo-localization";
-import { i18n, Language } from "@/localization";
+import { getLocales } from 'expo-localization';
+import { i18n, Language } from '@/localization';
 import * as Sentry from '@sentry/react-native';
-import Constants, { ExecutionEnvironment } from "expo-constants";
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
   enableTimeToInitialDisplay:
@@ -32,18 +32,18 @@ Sentry.init({
   // enableSpotlight: __DEV__,
 });
 // Define location and language
-i18n.locale = getLocales()[0].languageCode ?? "vn";
+i18n.locale = getLocales()[0].languageCode ?? 'vn';
 i18n.enableFallback = true;
 i18n.defaultLocale = Language.VIETNAMESE;
 
 function RootLayout() {
   const [loaded] = useFonts({
-    Roboto: require("../assets/fonts/Roboto-Black.ttf"),
-    "Roboto-Bold": require("../assets/fonts/Roboto-Bold.ttf"),
-    "Roboto-Light": require("../assets/fonts/Roboto-Light.ttf"),
-    "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
-    "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
-    "Roboto-Thin": require("../assets/fonts/Roboto-Thin.ttf"),
+    Roboto: require('../assets/fonts/Roboto-Black.ttf'),
+    'Roboto-Bold': require('../assets/fonts/Roboto-Bold.ttf'),
+    'Roboto-Light': require('../assets/fonts/Roboto-Light.ttf'),
+    'Roboto-Medium': require('../assets/fonts/Roboto-Medium.ttf'),
+    'Roboto-Regular': require('../assets/fonts/Roboto-Regular.ttf'),
+    'Roboto-Thin': require('../assets/fonts/Roboto-Thin.ttf'),
   });
 
   useEffect(() => {

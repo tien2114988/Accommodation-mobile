@@ -127,7 +127,7 @@ const EditProfile = () => {
         } else {
           //   Update user
           dispatch(setUser(values as any));
-          router.replace(`/(tabs)/(profile)`);
+          router.replace(`/(tabs)/(profile)/profile`);
         }
       } catch (error) {
         console.error(error);

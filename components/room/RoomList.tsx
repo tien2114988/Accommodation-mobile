@@ -19,7 +19,6 @@ import { router } from 'expo-router';
 import { timeAgo } from '@/utils/dateUtil';
 
 interface Props {
-  isFetching: boolean;
   rooms: PostModel[];
   refetch: (options?: {
     force?: boolean;
@@ -27,7 +26,7 @@ interface Props {
   }) => Promise<any>;
 }
 
-const RoomList = ({ rooms, refetch, isFetching }: Props) => {
+const RoomList = ({ rooms, refetch }: Props) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const navigateToRoom = (id: number) => {
@@ -113,19 +112,22 @@ const RoomList = ({ rooms, refetch, isFetching }: Props) => {
   }
 
   return (
-    <FlatList
-      data={rooms}
-      renderItem={renderItem}
-      keyExtractor={item => item.id.toString()}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-      // onEndReached={loadMore}
-      // onEndReachedThreshold={0.5}
-      // ListFooterComponent={
-      //   isFetching ? <ActivityIndicator size="small" /> : null
-      // }
-    />
+    <Box className="mb-10">
+      <FlatList
+        data={rooms}
+        renderItem={renderItem}
+        keyExtractor={item => item.id.toString()}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+
+        // onEndReached={loadMore}
+        // onEndReachedThreshold={0.5}
+        // ListFooterComponent={
+        //   isFetching ? <ActivityIndicator size="small" /> : null
+        // }
+      />
+    </Box>
   );
 };
 

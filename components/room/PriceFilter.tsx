@@ -3,7 +3,6 @@ import { VStack } from '@/components/ui/vstack';
 import { Text } from '@/components/ui/text';
 import Slider from '@react-native-community/slider';
 import { Divider } from '../ui/divider';
-import { Mode } from '@/app/(tabs)/(search)';
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -16,6 +15,7 @@ import {
 import { Button, ButtonText } from '../ui/button';
 import { Heading } from '../ui/heading';
 import { Input, InputField } from '../ui/input';
+import { Mode } from '@/constants/room';
 
 interface Props {
   showActionSheet: boolean;

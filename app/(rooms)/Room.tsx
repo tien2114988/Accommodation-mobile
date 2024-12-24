@@ -1,42 +1,30 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Pressable, SafeAreaView, ScrollView } from "react-native";
-import { Box } from "@/components/ui/box";
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Pressable, SafeAreaView, ScrollView } from 'react-native';
+import { Box } from '@/components/ui/box';
 import {
   useDeletePostMutation,
   useGetPostByIdQuery,
   useGetPostsByUserIdQuery,
-} from "@/services/post";
+} from '@/services/post';
 import {
   Toast,
   ToastDescription,
   ToastTitle,
   useToast,
-} from "@/components/ui/toast";
+} from '@/components/ui/toast';
 
-import { Image } from "@/components/ui/image";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
-import { HStack } from "@/components/ui/hstack";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { Divider } from "@/components/ui/divider";
-import { Grid, GridItem } from "@/components/ui/grid";
-import { stringToArray } from "@/utils/stringUtil";
-import RoomDetailSkeleton from "@/components/skeleton/RoomDetailSkeleton";
-import { useSelector } from "react-redux";
-import { selectUser } from "@/store/reducers";
-import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
-
-const room = {
-  thumbnail:
-    "https://www.xotels.com/wp-content/uploads/2022/07/Executive-Room-XOTELS.webp",
-  title:
-    "Cần tìm nam ở ghép, trọn gói 1 triệu cả để xe, điện nước, gần trường đại học Nông Lâm",
-  type: "Chung cư mini",
-  price: 1600000,
-  location: "Phường 8, Quận 10, Thành phố Hồ Chí Minh",
-  phoneNumber: "0346066323",
-};
+import { Image } from '@/components/ui/image';
+import { Text } from '@/components/ui/text';
+import { VStack } from '@/components/ui/vstack';
+import { HStack } from '@/components/ui/hstack';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { Divider } from '@/components/ui/divider';
+import { stringToArray } from '@/utils/stringUtil';
+import RoomDetailSkeleton from '@/components/skeleton/RoomDetailSkeleton';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/store/reducers';
+import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button';
 
 const Room = () => {
   const user = useSelector(selectUser);
@@ -46,7 +34,7 @@ const Room = () => {
     useDeletePostMutation();
   const { refetch } = useGetPostsByUserIdQuery({
     id: user?.id,
-    postType: data?.postType ?? "Phòng",
+    postType: data?.postType ?? 'Phòng',
   });
   const toast = useToast();
   const router = useRouter();
@@ -55,7 +43,7 @@ const Room = () => {
 
   const navigateToAccount = () => {
     if (data?.postedBy.id === user?.id) {
-      router.push("/(tabs)/(profile)/profile");
+      router.push('/(tabs)/(profile)/profile');
     } else {
       router.push(`/(friend)/infor?id=${data?.postedBy.id}`);
     }
@@ -66,10 +54,10 @@ const Room = () => {
     console.info({ res, error });
     if (!error) {
       toast.show({
-        placement: "top",
+        placement: 'top',
         duration: 3000,
         render: ({ id }) => {
-          const uniqueToastId = "toast-" + id;
+          const uniqueToastId = 'toast-' + id;
           return (
             <Toast nativeID={uniqueToastId} action="success" variant="outline">
               <ToastTitle>Xóa phòng thành công</ToastTitle>
@@ -82,10 +70,10 @@ const Room = () => {
       router.back();
     } else {
       toast.show({
-        placement: "top",
+        placement: 'top',
         duration: 3000,
         render: ({ id }) => {
-          const uniqueToastId = "toast-" + id;
+          const uniqueToastId = 'toast-' + id;
           return (
             <Toast nativeID={uniqueToastId} action="error" variant="outline">
               <ToastTitle>Xóa phòng thất bại</ToastTitle>
@@ -100,10 +88,10 @@ const Room = () => {
   useEffect(() => {
     if (error) {
       toast.show({
-        placement: "top",
+        placement: 'top',
         duration: 3000,
         render: ({ id }) => {
-          const uniqueToastId = "toast-" + id;
+          const uniqueToastId = 'toast-' + id;
           return (
             <Toast nativeID={uniqueToastId} action="error" variant="outline">
               <ToastTitle>
@@ -129,9 +117,9 @@ const Room = () => {
             size="2xl"
             source={{
               uri: data?.pictures[imageIndex]
-                ? "https://accomodation-seeking-backend.onrender.com/pictures/" +
+                ? 'https://accomodation-seeking-backend.onrender.com/pictures/' +
                   data?.pictures[imageIndex]
-                : "https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg",
+                : 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg',
             }}
             alt="image"
             className="rounded-lg w-full h-80"
@@ -147,12 +135,12 @@ const Room = () => {
                         size="lg"
                         source={{
                           uri:
-                            "https://accomodation-seeking-backend.onrender.com/pictures/" +
+                            'https://accomodation-seeking-backend.onrender.com/pictures/' +
                             img,
                         }}
                         alt="image"
-                        className={`rounded-lg ${pressed && "opacity-75"} ${
-                          i === imageIndex && "border-2 border-info-400"
+                        className={`rounded-lg ${pressed && 'opacity-75'} ${
+                          i === imageIndex && 'border-2 border-info-400'
                         }`}
                       />
                     )}
@@ -162,9 +150,9 @@ const Room = () => {
           </ScrollView>
           <Box className="flex flex-row justify-between items-center">
             <Text className="w-1/2 text-tertiary-500">• {data?.roomType}</Text>
-            {data?.gender && ["Nam", "Nữ"].includes(data.gender) && (
+            {data?.gender && ['Nam', 'Nữ'].includes(data.gender) && (
               <HStack space="xs" className="">
-                {data.gender === "Nam" ? (
+                {data.gender === 'Nam' ? (
                   <Text className="text-info-500">
                     <Ionicons size={20} name="male-outline" />
                   </Text>
@@ -234,27 +222,17 @@ const Room = () => {
               <Divider />
               <Text className="font-medium text-lg text-black">Tiện nghi</Text>
 
-              <Grid
-                className="gap-4"
-                _extra={{
-                  className: "grid-cols-9",
-                }}
-              >
+              <Box className="flex flex-row flex-wrap">
                 {stringToArray(data?.utilities).map((utility, i) => (
-                  <GridItem
-                    key={i}
-                    _extra={{
-                      className: "col-span-3",
-                    }}
-                  >
+                  <Box key={i} className="w-1/3 p-1">
                     <Box className="border rounded-lg p-3 border-info-600">
                       <Text className="font-semibold text-info-600">
                         {utility}
                       </Text>
                     </Box>
-                  </GridItem>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             </VStack>
           )}
 
@@ -263,27 +241,17 @@ const Room = () => {
               <Divider />
               <Text className="font-medium text-lg text-black">Nội thất</Text>
 
-              <Grid
-                className="gap-4"
-                _extra={{
-                  className: "grid-cols-9",
-                }}
-              >
+              <Box className="flex flex-row flex-wrap">
                 {stringToArray(data?.interior).map((interior, i) => (
-                  <GridItem
-                    key={i}
-                    _extra={{
-                      className: "col-span-3",
-                    }}
-                  >
+                  <Box key={i} className="w-1/3 p-1">
                     <Box className="border rounded-lg p-3 border-info-600">
                       <Text className="font-semibold text-info-600">
                         {interior}
                       </Text>
                     </Box>
-                  </GridItem>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             </VStack>
           )}
 
@@ -292,7 +260,7 @@ const Room = () => {
             {({ pressed }) => (
               <Box
                 className={`flex flex-row justify-between items-center ${
-                  pressed && "opacity-50"
+                  pressed && 'opacity-50'
                 }`}
               >
                 <HStack space="md" className="items-center">
@@ -343,7 +311,7 @@ const Room = () => {
           )}
         </VStack>
       </ScrollView>
-      {data?.postedBy.id === user?.id && manage && manage != "" && (
+      {data?.postedBy.id === user?.id && manage && manage != '' && (
         <Box className="sticky bg-white p-4 rounded-t-lg shadow-lg">
           <Button
             size="xl"

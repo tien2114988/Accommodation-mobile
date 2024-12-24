@@ -5,7 +5,6 @@ import { Text } from '@/components/ui/text';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Divider } from '../ui/divider';
-import { Mode } from '@/app/(tabs)/(search)';
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -25,6 +24,7 @@ import {
   RadioIndicator,
   RadioIcon,
 } from '../ui/radio';
+import { Mode } from '@/constants/room';
 
 interface Props {
   showActionSheet: boolean;

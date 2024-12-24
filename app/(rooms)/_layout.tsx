@@ -24,12 +24,12 @@ export default function RoomsLayout() {
           headerShadowVisible: false,
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="PairSearch"
         options={{
           headerShown: false,
         }}
-      />
+      /> */}
     </Stack>
   );
 }

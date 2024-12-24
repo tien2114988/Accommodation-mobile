@@ -28,14 +28,7 @@ import { useDebounce } from '@/utils/helper';
 import { useGetProvincesQuery } from '@/services';
 import { DistrictModel, ProvinceModel } from '@/types/addressTypes';
 import { useRouter } from 'expo-router';
-
-export const Mode = {
-  ROOMTYPE: 'ROOMTYPE',
-  PRICE: 'PRICE',
-  SORT: 'SORT',
-  FILTER: 'FILTER',
-  LOCATION: 'LOCATION',
-};
+import { Mode } from '@/constants/room';
 
 interface FilterType {
   postType: string;

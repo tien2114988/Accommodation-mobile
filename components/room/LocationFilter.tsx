@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { VStack } from '@/components/ui/vstack';
 import { Divider } from '../ui/divider';
-import { Mode } from '@/app/(tabs)/(search)';
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -27,6 +26,7 @@ import { HStack } from '../ui/hstack';
 import { DistrictModel, ProvinceModel, WardModel } from '@/types/addressTypes';
 import { useDebounce } from '@/utils/helper';
 import { NullPlaceholderHandler } from 'i18n-js';
+import { Mode } from '@/constants/room';
 
 interface Props {
   showActionSheet: boolean;

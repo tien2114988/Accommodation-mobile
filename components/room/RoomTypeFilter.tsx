@@ -3,7 +3,6 @@ import { VStack } from '@/components/ui/vstack';
 import { Text } from '@/components/ui/text';
 import { Pressable } from '@/components/ui/pressable';
 import { Divider } from '../ui/divider';
-import { Mode } from '@/app/(tabs)/(search)';
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -16,8 +15,9 @@ import {
 import { Button, ButtonText } from '../ui/button';
 import { Grid, GridItem } from '../ui/grid';
 import { Heading } from '../ui/heading';
-import { roomTypes } from '@/constants/room';
+import { Mode, roomTypes } from '@/constants/room';
 import { stringToArray } from '@/utils/stringUtil';
+import { Box } from '../ui/box';
 
 interface Props {
   showActionSheet: boolean;
@@ -85,19 +85,9 @@ const RoomTypeFilter = ({
           <Divider />
         </ActionsheetItem>
         <ActionsheetItem disabled>
-          <Grid
-            className="gap-4"
-            _extra={{
-              className: 'grid-cols-8',
-            }}
-          >
+          <Box className="flex flex-row flex-wrap">
             {roomTypes.map((roomType, index) => (
-              <GridItem
-                key={index}
-                _extra={{
-                  className: 'col-span-4',
-                }}
-              >
+              <Box key={index} className="w-1/2 p-2">
                 <Pressable
                   onPress={() => handleChooseRoomType(roomType)}
                   className={`border rounded-lg p-3 ${
@@ -116,9 +106,9 @@ const RoomTypeFilter = ({
                     {roomType}
                   </Text>
                 </Pressable>
-              </GridItem>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </ActionsheetItem>
         <ActionsheetItem disabled>
           <Divider />

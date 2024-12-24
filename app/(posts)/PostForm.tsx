@@ -1,54 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { SafeAreaView, ScrollView } from 'react-native';
 import { VStack } from '@/components/ui/vstack';
-import {
-  BabysittingModel,
-  CreatePostModel,
-  CreateWorkScheduleModel,
-  HouseCleaningModel,
-  HouseCleaningOption,
-  Package,
-} from '@/types/postTypes';
+import { CreatePostModel } from '@/types/postTypes';
 import { Box } from '@/components/ui/box';
-import {
-  convertToTime,
-  generateNext7Days,
-  getWorkSchedulesByDaysOfWeek,
-} from '@/utils/dateUtil';
+
 import { Button, ButtonText } from '@/components/ui/button';
 import { router, useLocalSearchParams } from 'expo-router';
-import {
-  calculateBabysittingPrice,
-  calculateHouseCleaningPrice,
-} from '@/utils/priceUtil';
-import { PackageName, WorkType } from '@/constants';
-import PackageSelect, { packages } from '@/components/post/PackageSelect';
-import PostOption from '@/components/post/PostOption';
-import WorkSchedule from '@/components/post/WorkSchedule';
-import HouseCleaningSelect, {
-  houseCleaningOptions,
-} from '@/components/post/HouseCleaningSelect';
-import BabysittingSelect, {
-  ageRange,
-  babysittingDurations,
-  numsOfBaby,
-} from '@/components/post/BabysittingSelect';
+
 import { useDispatch } from 'react-redux';
 import { setPostForm } from '@/store/reducers';
-import {
-  Toast,
-  ToastDescription,
-  ToastTitle,
-  useToast,
-} from '@/components/ui/toast';
-import { LinearGradient } from 'expo-linear-gradient';
+
 import { HStack } from '@/components/ui/hstack';
 import { Input, InputField } from '@/components/ui/input';
 
 import { Text } from '@/components/ui/text';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Card } from '@/components/ui/card';
-import { Heading } from '@/components/ui/heading';
 import {
   FormControl,
   FormControlError,

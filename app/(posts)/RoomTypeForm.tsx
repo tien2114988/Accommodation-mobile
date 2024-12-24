@@ -8,12 +8,10 @@ import { Text } from '@/components/ui/text';
 import { Card } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { Pressable } from '@/components/ui/pressable';
-import { Grid, GridItem } from '@/components/ui/grid';
 import { convenients, interiors, roomTypes } from '@/constants/room';
 import { stringToArray } from '@/utils/stringUtil';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { CreatePostModel } from '@/types/postTypes';
 import { useRouter } from 'expo-router';
 
 const RoomTypeForm = () => {
@@ -77,19 +75,9 @@ const RoomTypeForm = () => {
           <VStack space="md">
             <Card size="md" variant="elevated">
               <Heading className="mb-4">Loại phòng</Heading>
-              <Grid
-                className="gap-4"
-                _extra={{
-                  className: 'grid-cols-9',
-                }}
-              >
+              <Box className="flex flex-row flex-wrap">
                 {roomTypes.map((type, index) => (
-                  <GridItem
-                    key={index}
-                    _extra={{
-                      className: 'col-span-4',
-                    }}
-                  >
+                  <Box key={index} className="w-1/2 p-2">
                     <Pressable
                       onPress={() => setRoomType(type)}
                       className={`border rounded-lg p-3 ${
@@ -108,25 +96,15 @@ const RoomTypeForm = () => {
                         {type}
                       </Text>
                     </Pressable>
-                  </GridItem>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             </Card>
             <Card size="md" variant="elevated">
               <Heading className="mb-4">Tiện nghi</Heading>
-              <Grid
-                className="gap-4"
-                _extra={{
-                  className: 'grid-cols-9',
-                }}
-              >
+              <Box className="flex flex-row flex-wrap">
                 {convenients.map((convenient, index) => (
-                  <GridItem
-                    key={index}
-                    _extra={{
-                      className: 'col-span-4',
-                    }}
-                  >
+                  <Box key={index} className="w-1/2 p-2">
                     <Pressable
                       onPress={() => handleChooseConvenient(convenient)}
                       className={`border rounded-lg p-3 ${
@@ -145,25 +123,15 @@ const RoomTypeForm = () => {
                         {convenient}
                       </Text>
                     </Pressable>
-                  </GridItem>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             </Card>
             <Card size="md" variant="elevated">
               <Heading className="mb-4">Loại phòng</Heading>
-              <Grid
-                className="gap-4"
-                _extra={{
-                  className: 'grid-cols-9',
-                }}
-              >
+              <Box className="flex flex-row flex-wrap">
                 {interiors.map((int, index) => (
-                  <GridItem
-                    key={index}
-                    _extra={{
-                      className: 'col-span-4',
-                    }}
-                  >
+                  <Box key={index} className="w-1/2 p-2">
                     <Pressable
                       onPress={() => handleChooseInterior(int)}
                       className={`border rounded-lg p-3 ${
@@ -182,9 +150,9 @@ const RoomTypeForm = () => {
                         {int}
                       </Text>
                     </Pressable>
-                  </GridItem>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             </Card>
           </VStack>
         </Box>

@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { VStack } from '@/components/ui/vstack';
 import { Divider } from '../ui/divider';
-import { Mode } from '@/app/(tabs)/(search)';
 import {
   Actionsheet,
   ActionsheetBackdrop,

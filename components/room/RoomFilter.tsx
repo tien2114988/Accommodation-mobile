@@ -7,7 +7,6 @@ import { Pressable } from '@/components/ui/pressable';
 import { Box } from '@/components/ui/box';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Divider } from '../ui/divider';
-import { Mode } from '@/app/(tabs)/(search)';
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -18,7 +17,6 @@ import {
   ActionsheetItemText,
 } from '../ui/actionsheet';
 import { Button, ButtonText } from '../ui/button';
-import { Grid, GridItem } from '../ui/grid';
 import { Heading } from '../ui/heading';
 import { CircleIcon } from '../ui/icon';
 import { Input, InputField } from '../ui/input';
@@ -30,7 +28,7 @@ import {
   RadioIcon,
 } from '../ui/radio';
 
-import { convenients, interiors, roomTypes } from '@/constants/room';
+import { convenients, interiors, Mode, roomTypes } from '@/constants/room';
 import Slider from '@react-native-community/slider';
 import { stringToArray } from '@/utils/stringUtil';
 
@@ -275,20 +273,11 @@ const RoomFilter = ({
           <ActionsheetItem disabled>
             <VStack space="xl" className="w-full">
               <Text className="text-xl font-semibold">Loại phòng</Text>
-              <Grid
-                className="gap-4"
-                _extra={{
-                  className: 'grid-cols-8',
-                }}
-              >
+              <Box className="flex flex-row flex-wrap">
                 {roomTypes.map((roomType, index) => (
-                  <GridItem
-                    key={index}
-                    _extra={{
-                      className: 'col-span-4',
-                    }}
-                  >
+                  <Box key={index} className="w-1/2 p-1">
                     <Pressable
+                      key={index}
                       onPress={() => handleChooseRoomType(roomType)}
                       className={`border rounded-lg p-3 ${
                         stringToArray(currentRoomTypes).includes(roomType)
@@ -306,27 +295,17 @@ const RoomFilter = ({
                         {roomType}
                       </Text>
                     </Pressable>
-                  </GridItem>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             </VStack>
           </ActionsheetItem>
           <ActionsheetItem disabled>
             <VStack space="xl" className="w-full">
               <Text className="text-xl font-semibold">Tiện nghi</Text>
-              <Grid
-                className="gap-4"
-                _extra={{
-                  className: 'grid-cols-8',
-                }}
-              >
+              <Box className="flex flex-row flex-wrap">
                 {convenients.map((convenient, index) => (
-                  <GridItem
-                    key={index}
-                    _extra={{
-                      className: 'col-span-4',
-                    }}
-                  >
+                  <Box key={index} className="w-1/2 p-1">
                     <Pressable
                       onPress={() => handleChooseConvenient(convenient)}
                       className={`border rounded-lg p-3 ${
@@ -345,27 +324,17 @@ const RoomFilter = ({
                         {convenient}
                       </Text>
                     </Pressable>
-                  </GridItem>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             </VStack>
           </ActionsheetItem>
           <ActionsheetItem disabled>
             <VStack space="xl" className="w-full">
               <Text className="text-xl font-semibold">Nội thất</Text>
-              <Grid
-                className="gap-4"
-                _extra={{
-                  className: 'grid-cols-8',
-                }}
-              >
+              <Box className="flex flex-row flex-wrap">
                 {interiors.map((interior, index) => (
-                  <GridItem
-                    key={index}
-                    _extra={{
-                      className: 'col-span-4',
-                    }}
-                  >
+                  <Box key={index} className="w-1/2 p-1">
                     <Pressable
                       onPress={() => handleChooseInterior(interior)}
                       className={`border rounded-lg p-3 ${
@@ -384,9 +353,9 @@ const RoomFilter = ({
                         {interior}
                       </Text>
                     </Pressable>
-                  </GridItem>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             </VStack>
           </ActionsheetItem>
         </ScrollView>

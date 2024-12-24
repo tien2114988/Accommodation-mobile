@@ -16,3 +16,11 @@ export const interiors = [
 ];
 
 export const convenients = ['Ban công', 'Giờ linh hoạt', 'Nuôi pet'];
+
+export const Mode = {
+  ROOMTYPE: 'ROOMTYPE',
+  PRICE: 'PRICE',
+  SORT: 'SORT',
+  FILTER: 'FILTER',
+  LOCATION: 'LOCATION',
+};
