@@ -35,7 +35,15 @@
         }
       ],
       "expo-localization",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "javascript-react",
+          "organization": "huynhthai"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
