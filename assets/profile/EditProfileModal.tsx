@@ -96,11 +96,11 @@ const EditProfileModal = ({ showEditModal, setShowEditModal }: Props) => {
       id: currentUser?.id!,
     });
     // Error ???
-    console.log("res", res);
+    // console.log("res", res);
     dispatch(
       setUser({
         ...currentUser,
-        picture: res.error.data,
+        picture: res.error.data + "?timestamp=" + new Date().getTime(),
       } as any)
     );
   };
