@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   ListRenderItemInfo,
   RefreshControl,
@@ -18,6 +19,7 @@ import { router } from 'expo-router';
 import { timeAgo } from '@/utils/dateUtil';
 
 interface Props {
+  isFetching: boolean;
   rooms: PostModel[];
   refetch: (options?: {
     force?: boolean;
@@ -25,11 +27,11 @@ interface Props {
   }) => Promise<any>;
 }
 
-const RoomList = ({ rooms, refetch }: Props) => {
+const RoomList = ({ rooms, refetch, isFetching }: Props) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const navigateToRoom = (id: number) => {
-    console.log(id);
+    // console.log(id);
     router.push(`/(rooms)/Room?id=${id}`);
   };
 
@@ -65,6 +67,7 @@ const RoomList = ({ rooms, refetch }: Props) => {
                   className="rounded-lg"
                 />
               </Box>
+
               <VStack space="xs" className="w-2/3">
                 <Text className="font-medium line-clamp-2">{item.name}</Text>
                 <Box className="flex flex-row justify-between items-center">
@@ -94,11 +97,18 @@ const RoomList = ({ rooms, refetch }: Props) => {
 
   if (rooms.length <= 0) {
     return (
-      <Box className="flex flex-row w-full justify-center items-center">
-        <Text className="text-lg text-secondary-400 text-center py-10">
-          Không có bài đăng
-        </Text>
-      </Box>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        className="h-full"
+      >
+        <Box className="flex flex-row w-full justify-center items-center">
+          <Text className="text-lg text-secondary-400 text-center py-10">
+            Không có bài đăng
+          </Text>
+        </Box>
+      </ScrollView>
     );
   }
 
@@ -110,6 +120,11 @@ const RoomList = ({ rooms, refetch }: Props) => {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
+      // onEndReached={loadMore}
+      // onEndReachedThreshold={0.5}
+      // ListFooterComponent={
+      //   isFetching ? <ActivityIndicator size="small" /> : null
+      // }
     />
   );
 };

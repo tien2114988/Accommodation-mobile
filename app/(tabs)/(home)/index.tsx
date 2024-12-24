@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Image,
   TouchableWithoutFeedback,
+  ScrollView,
 } from "react-native";
 import { useSelector } from "react-redux";
 import * as SecureStore from "expo-secure-store";
@@ -38,7 +39,7 @@ const Home = () => {
   // Posts query
   const {
     data: posts,
-    error,
+    refetch,
     isLoading,
   } = useGetPostsQuery({
     limit: 2,
@@ -58,12 +59,14 @@ const Home = () => {
       setToken(storedToken);
     };
     fetchToken();
+    refetch();
   }, []);
 
   useEffect(() => {
     if (token && userData) {
       dispatch(setUser(userData)); // Save user data in Redux
     }
+    refetch();
   }, [token, userData, dispatch]);
 
   if (isLoading || userLoading) {
@@ -77,7 +80,7 @@ const Home = () => {
   }
 
   // console.log('Current User:', currentUser);
-  // console.log("Token:", token);
+  // console.log("Token:", posts);
 
   return (
     <SafeAreaView className="relative h-full flex items-center bg-gray-100">
@@ -145,37 +148,45 @@ const Home = () => {
         {/* Button */}
         <Box className="flex flex-row w-full justify-around mt-2">
           <Pressable
-            className="flex items-center w-1/4"
+            className="w-1/4"
             onPress={() => {
               router.push(`/(tabs)/(search)`);
             }}
           >
-            <Image
-              source={require("@/assets/images/btn1.png")}
-              className="w-10 h-10"
-              resizeMode="cover"
-            />
-            <Text size="md" className="font-medium text-center">
-              Tìm kiếm phòng trọ
-            </Text>
+            {({ pressed }) => (
+              <Box className={`flex items-center ${pressed && "opacity-75"}`}>
+                <Image
+                  source={require("@/assets/images/btn1.png")}
+                  className="w-10 h-10"
+                  resizeMode="cover"
+                />
+                <Text size="md" className="font-medium text-center">
+                  Tìm kiếm phòng trọ
+                </Text>
+              </Box>
+            )}
           </Pressable>
           <Pressable
-            className="flex items-center w-1/4"
+            className="w-1/4"
             onPress={() => {
               router.push(`/(rooms)/PairSearch`);
             }}
           >
-            <Image
-              source={require("@/assets/images/btn2.png")}
-              className="w-10 h-10"
-              resizeMode="cover"
-            />
-            <Text size="md" className="font-medium text-center">
-              Tìm kiếm ở ghép
-            </Text>
+            {({ pressed }) => (
+              <Box className={`flex items-center ${pressed && "opacity-75"}`}>
+                <Image
+                  source={require("@/assets/images/btn2.png")}
+                  className="w-10 h-10"
+                  resizeMode="cover"
+                />
+                <Text size="md" className="font-medium text-center">
+                  Tìm kiếm ở ghép
+                </Text>
+              </Box>
+            )}
           </Pressable>
           <Pressable
-            className="flex items-center w-1/4"
+            className="w-1/4"
             onPress={() => {
               if (!isAuthenticated) {
                 setShowModal(true);
@@ -184,17 +195,21 @@ const Home = () => {
               }
             }}
           >
-            <Image
-              source={require("@/assets/images/btn3.png")}
-              className="w-10 h-10"
-              resizeMode="cover"
-            />
-            <Text size="md" className="font-medium text-center">
-              Đăng tin cho thuê
-            </Text>
+            {({ pressed }) => (
+              <Box className={`flex items-center ${pressed && "opacity-75"}`}>
+                <Image
+                  source={require("@/assets/images/btn3.png")}
+                  className="w-10 h-10"
+                  resizeMode="cover"
+                />
+                <Text size="md" className="font-medium text-center">
+                  Đăng tin cho thuê
+                </Text>
+              </Box>
+            )}
           </Pressable>
           <Pressable
-            className="flex items-center w-1/4"
+            className="w-1/4"
             onPress={() => {
               if (!isAuthenticated) {
                 setShowModal(true);
@@ -203,14 +218,18 @@ const Home = () => {
               }
             }}
           >
-            <Image
-              source={require("@/assets/images/btn4.png")}
-              className="w-10 h-10"
-              resizeMode="cover"
-            />
-            <Text size="md" className="font-medium text-center">
-              Đăng tin ở ghép
-            </Text>
+            {({ pressed }) => (
+              <Box className={`flex items-center ${pressed && "opacity-75"}`}>
+                <Image
+                  source={require("@/assets/images/btn4.png")}
+                  className="w-10 h-10"
+                  resizeMode="cover"
+                />
+                <Text size="md" className="font-medium text-center">
+                  Đăng tin ở ghép
+                </Text>
+              </Box>
+            )}
           </Pressable>
         </Box>
       </Box>
@@ -233,12 +252,17 @@ const Home = () => {
           <Pressable
             className="w-auto"
             onPress={() => {
-              router.push(`/(rooms)/RoomManagement`);
+              router.push(`/(tabs)/(search)`);
             }}
           >
-            <Text size="md" className="text-info-700 font-bold">
-              Xem thêm
-            </Text>
+            {({ pressed }) => (
+              <Text
+                size="md"
+                className={`text-info-700 font-bold ${pressed && "opacity-75"}`}
+              >
+                Xem thêm
+              </Text>
+            )}
           </Pressable>
         </Box>
 

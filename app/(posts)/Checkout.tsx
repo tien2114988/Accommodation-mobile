@@ -55,12 +55,6 @@ const Checkout = () => {
     postType: postForm?.postType ?? 'Phòng',
   });
   const toast = useToast();
-  const normalizeUri = (uri: string) => {
-    if (Platform.OS === 'android') {
-      return uri.replace('file://', '');
-    }
-    return uri;
-  };
 
   const handlePost = async () => {
     if (postForm != null) {
@@ -151,7 +145,9 @@ const Checkout = () => {
             });
             dispatch(clearPostForm());
 
-            router.dismissTo(`/(rooms)/RoomManagement`);
+            const type = postForm.postType === 'Phòng' ? 'room' : 'pair';
+
+            router.dismissTo(`/(rooms)/RoomManagement?type=${type}`);
           }
         } else {
           refetch();
@@ -174,7 +170,9 @@ const Checkout = () => {
           });
           dispatch(clearPostForm());
 
-          router.dismissTo(`/(rooms)/RoomManagement`);
+          const type = postForm.postType === 'Phòng' ? 'room' : 'pair';
+
+          router.dismissTo(`/(rooms)/RoomManagement?type=${type}`);
         }
       }
     }

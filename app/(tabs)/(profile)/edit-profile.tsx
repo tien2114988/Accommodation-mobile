@@ -1,4 +1,4 @@
-import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
+import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button';
 import {
   FormControl,
   FormControlError,
@@ -8,7 +8,7 @@ import {
   FormControlHelperText,
   FormControlLabel,
   FormControlLabelText,
-} from "@/components/ui/form-control";
+} from '@/components/ui/form-control';
 import {
   AlertCircleIcon,
   AtSignIcon,
@@ -19,16 +19,16 @@ import {
   LockIcon,
   MailIcon,
   PhoneIcon,
-} from "@/components/ui/icon";
-import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+} from '@/components/ui/icon';
+import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import {
   useGetUserQuery,
   useSignupMutation,
   useUpdateUserMutation,
   useVerifyJwtForUserQuery,
-} from "@/services";
-import { Link, router } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+} from '@/services';
+import { Link, router } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -40,51 +40,51 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Box } from "@/components/ui/box";
-import { formatDate, useDebounce, validateEmail } from "@/utils/helper";
-import { Text } from "@/components/ui/text";
-import * as Yup from "yup";
-import { Form, Formik, useFormik } from "formik";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import * as SecureStore from "expo-secure-store";
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Box } from '@/components/ui/box';
+import { formatDate, useDebounce, validateEmail } from '@/utils/helper';
+import { Text } from '@/components/ui/text';
+import * as Yup from 'yup';
+import { Form, Formik, useFormik } from 'formik';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import * as SecureStore from 'expo-secure-store';
 import {
   Toast,
   ToastDescription,
   ToastTitle,
   useToast,
-} from "@/components/ui/toast";
-import { useDispatch } from "react-redux";
-import { authenticateUser, selectUser, setUser } from "@/store/reducers";
-import { LOCAL_STORAGE_JWT_KEY } from "@/constants";
-import { ScrollView } from "react-native";
-import { useSelector } from "react-redux";
+} from '@/components/ui/toast';
+import { useDispatch } from 'react-redux';
+import { authenticateUser, selectUser, setUser } from '@/store/reducers';
+import { LOCAL_STORAGE_JWT_KEY } from '@/constants';
+import { ScrollView } from 'react-native';
+import { useSelector } from 'react-redux';
 import {
   Radio,
   RadioGroup,
   RadioIcon,
   RadioIndicator,
   RadioLabel,
-} from "@/components/ui/radio";
-import { VStack } from "@/components/ui/vstack";
+} from '@/components/ui/radio';
+import { VStack } from '@/components/ui/vstack';
 
 const InforSchema = Yup.object().shape({
   name: Yup.string()
-    .min(2, "Tên phải có ít nhất 2 ký tự")
-    .required("Vui lòng nhập tên"),
+    .min(2, 'Tên phải có ít nhất 2 ký tự')
+    .required('Vui lòng nhập tên'),
   phone: Yup.string()
-    .matches(/^[0-9]+$/, "Số điện thoại không hợp lệ")
-    .min(10, "Số điện thoại phải có ít nhất 10 chữ số")
-    .required("Vui lòng nhập số điện thoại"),
+    .matches(/^[0-9]+$/, 'Số điện thoại không hợp lệ')
+    .min(10, 'Số điện thoại phải có ít nhất 10 chữ số')
+    .required('Vui lòng nhập số điện thoại'),
   birthdate: Yup.date()
-    .max(new Date(), "Ngày sinh không hợp lệ")
-    .required("Vui lòng chọn ngày sinh"),
-  gender: Yup.string().required("Vui lòng chọn giới tính"),
+    .max(new Date(), 'Ngày sinh không hợp lệ')
+    .required('Vui lòng chọn ngày sinh'),
+  gender: Yup.string().required('Vui lòng chọn giới tính'),
 });
 function extractDate(timestamp: any) {
-  return timestamp.split("T")[0] as any as Date;
+  return timestamp.split('T')[0] as any as Date;
 }
 
 const EditProfile = () => {
@@ -104,7 +104,7 @@ const EditProfile = () => {
   // Date
 
   const [date, setDate] = useState(
-    new Date(extractDate(currentUser?.birthdate))
+    new Date(extractDate(currentUser?.birthdate)),
   );
   const [showPicker, setShowPicker] = useState(false);
   // Form
@@ -112,7 +112,7 @@ const EditProfile = () => {
     initialValues: userForEdit,
     validationSchema: InforSchema,
     onSubmit: async (values, { setSubmitting }) => {
-      console.log("Form submitted with values:", values);
+      console.log('Form submitted with values:', values);
 
       try {
         const response = await update({
@@ -123,7 +123,7 @@ const EditProfile = () => {
           const message =
             response.error.data.message ||
             response.error.message ||
-            "Unknown error";
+            'Unknown error';
         } else {
           //   Update user
           dispatch(setUser(values as any));
@@ -145,27 +145,27 @@ const EditProfile = () => {
   };
 
   const onChange = ({ type }: any, selectedDate: Date | undefined) => {
-    if (type == "set" && selectedDate) {
+    if (type == 'set' && selectedDate) {
       const currentDate = selectedDate;
-      console.log("currentDate", currentDate);
+      console.log('currentDate', currentDate);
       setDate(currentDate);
-      if (Platform.OS === "android") {
+      if (Platform.OS === 'android') {
         toggleDatepicker();
       }
-      formik.setFieldValue("birthdate", formatDate(currentDate));
+      formik.setFieldValue('birthdate', formatDate(currentDate));
     } else {
       toggleDatepicker();
     }
   };
 
   const confirmIOSDate = () => {
-    formik.setFieldValue("birthdate", formatDate(date));
+    formik.setFieldValue('birthdate', formatDate(date));
     toggleDatepicker();
   };
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1 w-full" // Ensure the container takes full screen
     >
       <TouchableWithoutFeedback
@@ -209,14 +209,14 @@ const EditProfile = () => {
                 </FormControlLabel>
                 <Input size="lg" className="flex items-center h-12">
                   <InputSlot className="pl-3 flex items-center">
-                    <InputIcon as={AtSignIcon} size={"lg"} />
+                    <InputIcon as={AtSignIcon} size={'lg'} />
                   </InputSlot>
                   <InputField
                     className="leading-none px-4 py-2 h-full"
                     type="text"
                     placeholder={`Vui lòng nhập họ và tên`}
                     value={formik.values.name}
-                    onChangeText={formik.handleChange("name")}
+                    onChangeText={formik.handleChange('name')}
                     // onBlur={formik.handleBlur("name")} // Correct Formik method for onBlur
                   />
                 </Input>
@@ -250,14 +250,14 @@ const EditProfile = () => {
                         className="flex items-center h-12 justify-center"
                       >
                         <InputSlot className="pl-3 flex items-center">
-                          <InputIcon as={CalendarDaysIcon} size={"md"} />
+                          <InputIcon as={CalendarDaysIcon} size={'md'} />
                         </InputSlot>
 
                         <InputField
                           className="leading-none px-4 py-2 h-full"
                           type="text"
                           placeholder={`Vui lòng chọn ngày sinh`}
-                          value={date ? formatDate(date) : ""}
+                          value={date ? formatDate(date) : ''}
                           // onChangeText={formik.handleChange("birthdate")}
                           onPressIn={toggleDatepicker}
                           editable={false}
@@ -279,7 +279,7 @@ const EditProfile = () => {
                       onChange={onChange}
                     />
                   )}
-                  {showPicker && Platform.OS === "ios" && (
+                  {showPicker && Platform.OS === 'ios' && (
                     <View className="flex flex-row justify-center items-center w-full gap-3">
                       <TouchableOpacity
                         className="w-1/2 h-12 bg-error-400 rounded-lg flex justify-center items-center mt-2"
@@ -326,7 +326,7 @@ const EditProfile = () => {
                 </FormControlLabel>
                 <Input size="lg" className="flex items-center h-12">
                   <InputSlot className="pl-3 flex items-center">
-                    <InputIcon as={PhoneIcon} size={"md"} />
+                    <InputIcon as={PhoneIcon} size={'md'} />
                   </InputSlot>
                   <InputField
                     className="leading-none px-4 py-2 h-full"
@@ -335,7 +335,7 @@ const EditProfile = () => {
                     // value={email}
                     // onChangeText={(text) => setEmail(text)}
                     value={formik.values.phone}
-                    onChangeText={formik.handleChange("phone")}
+                    onChangeText={formik.handleChange('phone')}
                   />
                 </Input>
 
@@ -363,7 +363,7 @@ const EditProfile = () => {
                 <RadioGroup
                   className="my-2"
                   value={formik.values.gender}
-                  onChange={formik.handleChange("gender")}
+                  onChange={formik.handleChange('gender')}
                 >
                   <VStack space="sm">
                     <Radio size="lg" value="Nam">
@@ -389,21 +389,19 @@ const EditProfile = () => {
                 </FormControlError>
               </FormControl>
               {/* Button */}
-              <Box className="flex flex-col justify-between">
+              <Box className="flex flex-col justify-between mt-4">
                 {/* Login */}
-                <Pressable
+                <Button
                   onPress={() => {
                     formik.handleSubmit();
                   }}
-                  className={`w-full h-12 bg-[#0973A8] rounded-lg flex justify-center items-center mt-2 ${
-                    isLoading ? "opacity-70" : "opacity-100"
-                  }`}
+                  action="positive"
                 >
-                  {isLoading && <ActivityIndicator color="#D1D5DB" />}
-                  {!isLoading && (
-                    <Text className="text-white font-bold text-lg">Lưu</Text>
-                  )}
-                </Pressable>
+                  <ButtonText className="text-white font-bold text-lg">
+                    Lưu
+                  </ButtonText>
+                  {isLoading && <ButtonSpinner color="#D1D5DB" />}
+                </Button>
               </Box>
             </Box>
           </Box>
