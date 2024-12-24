@@ -59,7 +59,7 @@ const RoomTypeFilter = ({
         : roomType;
     }
 
-    console.log(updatedRoomTypes);
+    // console.log(updatedRoomTypes);
     setRoomType(updatedRoomTypes);
   };
 

@@ -91,7 +91,7 @@ const EditProfileModal = React.memo(
         type: image.type,
         name: image.name,
       } as any);
-      console.log("avatar", image);
+      // console.log("avatar", image);
       const res = await uploadAvatar({
         file: formData,
         id: currentUser?.id!,
@@ -100,7 +100,7 @@ const EditProfileModal = React.memo(
       dispatch(
         setUser({
           ...currentUser,
-          picture: res.error.data,
+          picture: res.error.data + "?timestamp=" + new Date().getTime(),
         } as any)
       );
     };
