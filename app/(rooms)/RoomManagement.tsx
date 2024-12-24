@@ -21,7 +21,7 @@ const RoomManagement = () => {
 
   const id = friendId ? +friendId : user?.id;
 
-  console.log(id);
+  // console.log(id);
 
   const { data, error, isFetching, refetch } = useGetPostsByUserIdQuery({
     id: id,

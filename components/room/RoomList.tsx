@@ -31,7 +31,7 @@ const RoomList = ({ rooms, refetch, isFetching }: Props) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const navigateToRoom = (id: number) => {
-    console.log(id);
+    // console.log(id);
     router.push(`/(rooms)/Room?id=${id}`);
   };
 

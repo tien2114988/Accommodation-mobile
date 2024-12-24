@@ -125,7 +125,7 @@ const SignUp = () => {
     initialValues: initialValues,
     validationSchema: SignUpSchema,
     onSubmit: async (values, { setSubmitting }) => {
-      console.log("Form submitted with values:", values);
+      // console.log("Form submitted with values:", values);
       try {
         const response = await signup({
           email: values.email,
@@ -135,7 +135,7 @@ const SignUp = () => {
           password: values.password,
           phone: values.phone,
         });
-        console.log(response);
+        // console.log(response);
         if (response.error) {
           const message =
             response.error.data.message ||
